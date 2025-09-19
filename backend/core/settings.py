@@ -41,8 +41,7 @@ INSTALLED_APPS = [
 	'corsheaders',
 	'rest_framework_simplejwt',
 	'multiselectfield',
-	'authentication',
-	'care2connect',
+	'c2c',
 ]
 
 MIDDLEWARE = [
