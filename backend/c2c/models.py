@@ -6,8 +6,8 @@ class Child(models.Model):
 	first_name = models.CharField(max_length=150)
 	last_name = models.CharField(max_length=150)
 	dob = models.DateField()
-	medications = models.TextField()
-	allergies = models.TextField()
+	medications = models.TextField(blank=True, null=True)
+	allergies = models.TextField(blank=True, null=True)
 
 class FosterFamily(models.Model):
 	family_name = models.CharField(max_length=256)
@@ -29,7 +29,7 @@ class Case(models.Model):
 	placement = models.ForeignKey(FosterPlacement, on_delete=models.SET_NULL, null=True)
 	start_date = models.DateField()
 	end_date = models.DateField(null=True, blank=True)
-	status = models.TextChoices('status', 'open', 'closed')
+	status = models.CharField(choices=[('open', 'Open'), ('closed', 'Closed')])
 
 class HealthService(models.Model):
 	SERVICE_CHOICES = (
@@ -69,7 +69,7 @@ class HealthService(models.Model):
 	immunizations = MultiSelectField(choices=IMMUNIZATION_CHOICES, min_choices=1, default=None, null=True)
 	due_date = models.DateField()
 	completed_date = models.DateField()
-	status = models.TextChoices('status', 'pending completed')
+	status = models.CharField(choices=[('pending', 'Pending'), ('complete', 'Complete')])
 	created_date = models.DateTimeField(auto_now_add=True)
 	updated_date = models.DateTimeField(null=True, default=None)
 
@@ -77,4 +77,4 @@ class ReminderLog(models.Model):
 	user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 	service = models.ForeignKey(HealthService, on_delete=models.SET_NULL, null=True)
 	set_date = models.DateTimeField()
-	status = models.TextChoices('status', 'sent failed')
+	status = models.CharField([('sent', 'failed')])
