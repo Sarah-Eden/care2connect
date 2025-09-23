@@ -77,4 +77,4 @@ class ReminderLog(models.Model):
 	user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 	service = models.ForeignKey(HealthService, on_delete=models.SET_NULL, null=True)
 	set_date = models.DateTimeField()
-	status = models.CharField([('sent', 'failed')])
+	status = models.CharField(choices=[('sent', 'Sent'), ('failed', 'Failed')])
