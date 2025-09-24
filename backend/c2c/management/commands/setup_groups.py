@@ -90,3 +90,7 @@ class Command(BaseCommand):
 		]
 		fosterparent_group.permissions.set(fosterparent_permissions)
 
+		self.stdout.write(self.style.SUCCESS('Groups and permissions set up successfully!'))
+	
+
+

@@ -4,7 +4,6 @@ import environ
 from datetime import timedelta
 
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -92,6 +91,7 @@ DATABASES = {
 SIMPLE_JWT = {
 	'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
 	'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+	'TOKEN_OBTAIN_SERIALIZER': 'c2c.serializers.CustomTokenObtainPairSerializer',
 }
 
 
@@ -118,11 +118,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 
@@ -137,8 +134,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS settings for React frontend
-CORS_ALLOWED_ORIGINS = [
-	'http://localhost:3000',
-]
-
+CORS_ALLOWED_ORIGINS = ['http://localhost:3000']
 CORS_ALLOW_CREDENTIALS = True

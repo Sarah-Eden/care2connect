@@ -18,19 +18,20 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.routers import DefaultRouter
-from c2c.views import UserViewSet, CaseViewSet, ChildViewSet, FosterFamilyViewSet, FosterPlacementViewSet, HealthServiceViewSet, ReminderLogViewSet
+from c2c.views import CreateUserView, UserViewSet, CaseViewSet, ChildViewSet, FosterFamilyViewSet, FosterPlacementViewSet, HealthServiceViewSet, ReminderLogViewSet
 
 router = DefaultRouter()
-router.register(r'users', UserViewSet)
-router.register(r'cases', CaseViewSet)
-router.register(r'children', ChildViewSet)
-router.register(r'foster-families', FosterFamilyViewSet)
-router.register(r'foster-placements', FosterPlacementViewSet)
-router.register(r'health-services', HealthServiceViewSet)
-router.register(r'reminders', ReminderLogViewSet)
+router.register(r'users', UserViewSet, basename='user')
+router.register(r'cases', CaseViewSet, basename='case')
+router.register(r'children', ChildViewSet, basename='child')
+router.register(r'foster-families', FosterFamilyViewSet, basename='fosterfamily')
+router.register(r'foster-placements', FosterPlacementViewSet, basename='fosterplacement')
+router.register(r'health-services', HealthServiceViewSet, basename='healthservice')
+router.register(r'reminders', ReminderLogViewSet, basename='reminderlog')
 				
 urlpatterns = [
     path('admin/', admin.site.urls),
+	path('api/register/', CreateUserView.as_view(), name='register'),
 	path('api/', include(router.urls)),
 	path('api/token/', TokenObtainPairView.as_view(), name='get_token'),
 	path('api/token/refresh/', TokenRefreshView.as_view(), name='refresh'),

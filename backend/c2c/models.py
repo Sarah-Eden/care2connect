@@ -9,6 +9,9 @@ class Child(models.Model):
 	medications = models.TextField(blank=True, null=True)
 	allergies = models.TextField(blank=True, null=True)
 
+	def __str__(self):
+		return f'{self.last_name}, {self.first_name}'
+
 class FosterFamily(models.Model):
 	family_name = models.CharField(max_length=256)
 	parent1 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='parent1')
@@ -16,17 +19,23 @@ class FosterFamily(models.Model):
 	max_occupancy = models.IntegerField(default=1)
 	current_occupancy = models.IntegerField(default=0)
 
+	def __str__(self):
+		return self.family_name
+
 class FosterPlacement(models.Model):
 	child = models.ForeignKey(Child, on_delete=models.SET_NULL, null=True)
 	foster_family = models.ForeignKey(FosterFamily, on_delete=models.SET_NULL, null=True)
 	start_date = models.DateField()
-	end_date = models.DateField(blank=True)
+	end_date = models.DateField(blank=True, null=True)
 	end_reason = models.TextField(null=True, blank=True)
+
+	def __str__(self):
+		return f'Child Last Name: {self.child.last_name}, Foster Family: {self.foster_family.family_name}'
 	
 class Case(models.Model):
 	child = models.ForeignKey(Child, on_delete=models.CASCADE)
 	caseworker = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-	placement = models.ForeignKey(FosterPlacement, on_delete=models.SET_NULL, null=True)
+	placement = models.ForeignKey(FosterPlacement, on_delete=models.SET_NULL, null=True, blank=True)
 	start_date = models.DateField()
 	end_date = models.DateField(null=True, blank=True)
 	status = models.CharField(choices=[('open', 'Open'), ('closed', 'Closed')])
@@ -68,13 +77,13 @@ class HealthService(models.Model):
 	service = MultiSelectField(choices=SERVICE_CHOICES, min_choices=1)
 	immunizations = MultiSelectField(choices=IMMUNIZATION_CHOICES, min_choices=1, default=None, null=True)
 	due_date = models.DateField()
-	completed_date = models.DateField()
+	completed_date = models.DateField(null=True, blank=True)
 	status = models.CharField(choices=[('pending', 'Pending'), ('complete', 'Complete')])
 	created_date = models.DateTimeField(auto_now_add=True)
-	updated_date = models.DateTimeField(null=True, default=None)
+	updated_date = models.DateTimeField(null=True, blank=True)
 
 class ReminderLog(models.Model):
 	user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 	service = models.ForeignKey(HealthService, on_delete=models.SET_NULL, null=True)
-	set_date = models.DateTimeField()
+	sent_date = models.DateTimeField()
 	status = models.CharField(choices=[('sent', 'Sent'), ('failed', 'Failed')])

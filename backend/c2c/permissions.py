@@ -4,63 +4,75 @@ from django.db.models import Q
 from .models import Child, Case, FosterPlacement, HealthService, ReminderLog
 from .utils import get_accessible_case_ids, get_accessible_child_ids
 
-class SupervisorGroupPermissions(BasePermission):
+class SupervisorPermissions(BasePermission):
 	# Full access to users in the Supervisors group
-	def has_permission(self, request, view): 
-		return request.user.is_authenticated and request.user.groups.filter(name='Supervisor').exists()
+	def has_permission(self, request, view):
+		return request.user.groups.filter(name='Supervisor').exists()
 	
 	def has_object_permission(self, request, view, obj):
-		return request.user.is_authenticated and request.user.groups.filter(name='Supervisor').exists()
+		return self.has_permission(request, view)
 	
-class CaseworkerGroupPermissions(BasePermission):
+class CaseworkerPermissions(BasePermission):
 	# Limits access to assigned cases and related data
 	def has_permission(self, request, view):
-		return request.user.is_authenticated and request.user.groups.filter(name='Caseworker').exists()
+		return request.user.groups.filter(name='Caseworker').exists()
 	
 	def has_object_permission(self, request, view, obj):
-		# Get list of cases assigned to caseworker
-		accessible_case_ids = get_accessible_case_ids(request.user)
-
-		if not self.has_permission(request, view):
+		user = request.user
+		if not self.has_permission(request, view): 
 			return False
+		# Get list of cases assigned to caseworker
+		accessible_case_ids = get_accessible_case_ids(user)
+
 		if isinstance(obj, Case):
 			return obj.id in accessible_case_ids
-		elif isinstance(obj, HealthService):
-			return Case.objects.filter(id__in=accessible_case_ids, placement=obj, status='open').exists()
-		elif isinstance(obj, FosterPlacement):
-			return Case.objects.filter(id__in=accessible_case_ids, placement=obj, status='open').exists()
-		elif isinstance(obj, ReminderLog):
-			if obj.service:
-				return Case.objects.filter(id_in=accessible_case_ids, child=obj.service.child, status='open').exists()
+		
+		if isinstance(obj, HealthService):
+			if obj.child:
+				return Case.objects.filter(id__in=accessible_case_ids, child=obj.child).exists()
+			return False
+		
+		if isinstance(obj, FosterPlacement):
+			return Case.objects.filter(id__in=accessible_case_ids, placement=obj).exists()
+		
+		if isinstance(obj, ReminderLog):
+			if obj.service and obj.service.child:
+				return Case.objects.filter(id__in=accessible_case_ids, child=obj.service.child).exists()
+			return False
+		
+		# Default to safe methods
 		return request.method in SAFE_METHODS
 
-class FosterParentGroupPermission(BasePermission):
+class FosterParentPermissions(BasePermission):
 	def has_permission(self, request, view):
-		return request.user.is_authenticated and request.user.groups.filter(name='FosterParent').exists()
+		return request.user.groups.filter(name='FosterParent').exists()
 	
 	def has_object_permission(self, request, view, obj):
+		user = request.user
+
 		if not self.has_permission(request, view):
 			return False
 		
 		# Query all active placements for the FosterParent user
-		child_in_placement = get_accessible_child_ids(request.user)
-		if not child_in_placement:
+		accessible_child_ids = get_accessible_child_ids(user)
+
+		if not accessible_child_ids:
 			return False
 		
-		if isinstance(obj, Case):
-			return obj.child in child_in_placement and request.method in ['GET', 'PUT', 'PATCH']
 		if isinstance(obj, Child):
-			return obj.id in child_in_placement
-		elif isinstance(obj, HealthService):
-			return obj.child_id in child_in_placement
-		elif isinstance(obj, ReminderLog):
-			if obj.service and obj.service.child_id in child_in_placement:
-				return True
+			return obj.id in accessible_child_ids
+		
+		if isinstance(obj, Case):
+			if obj.child.id in accessible_child_ids:
+				return request.method in SAFE_METHODS
 			return False
+		
+		if isinstance(obj, HealthService):
+			return obj.child.id in accessible_child_ids
+		
+		if isinstance(obj, ReminderLog):
+			if obj.service.child.id in accessible_child_ids:
+				return request.method in SAFE_METHODS
+			return False
+		# Default to no access
 		return False
-
-class ReadOnly(BasePermission):
-	def has_permission(self, request, view):
-		return request.method in SAFE_METHODS
-	def has_object_permission(self, request, view, obj):
-		return request.method in SAFE_METHODS
