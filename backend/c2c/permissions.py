@@ -1,7 +1,7 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from django.contrib.auth.models import Group
 from django.db.models import Q
-from .models import Child, Case, FosterPlacement, HealthService, ReminderLog
+from .models import Child, Case, FosterPlacement, HealthService, ImmunizationRecord, ReminderLog
 from .utils import get_accessible_case_ids, get_accessible_child_ids
 
 class SupervisorPermissions(BasePermission):
@@ -34,6 +34,10 @@ class CaseworkerPermissions(BasePermission):
 		
 		if isinstance(obj, FosterPlacement):
 			return Case.objects.filter(id__in=accessible_case_ids, placement=obj).exists()
+		
+		if isinstance(obj, ImmunizationRecord):
+			if obj.child:
+				return Case.objects.filter(id__in=accessible_case_ids, child=obj.child).exists()
 		
 		if isinstance(obj, ReminderLog):
 			if obj.service and obj.service.child:
@@ -70,6 +74,9 @@ class FosterParentPermissions(BasePermission):
 		if isinstance(obj, HealthService):
 			return obj.child.id in accessible_child_ids
 		
+		if isinstance(obj, ImmunizationRecord):
+			return obj.child.id in accessible_child_ids
+				
 		if isinstance(obj, ReminderLog):
 			if obj.service.child.id in accessible_child_ids:
 				return request.method in SAFE_METHODS
