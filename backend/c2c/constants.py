@@ -123,8 +123,8 @@ EPSDT_REQUIREMENTS = {
 			'display_name': 'Human papillomavirus (HPV)',
 			'total_doses': 2,
 			'schedule': [
-				{'age_months': [108], 'dose': '1st'},
-				{'age_months': [114, 120], 'dose': '2nd'}
+				{'age_months': 108, 'dose': '1st'},
+				{'age_months': 120, 'dose': '2nd'}
 		]}, 
 
 		'MenACWY-TT': {
@@ -132,7 +132,7 @@ EPSDT_REQUIREMENTS = {
 			'total_doses': 2,
 			'schedule': [
 				{'age_months': [132, 144], 'dose': '1st'},
-				{'age_months': [192], 'dose': '2nd'}
+				{'age_months': 192, 'dose': '2nd'}
 		]}, 
 
 		'IIV3': {
@@ -171,4 +171,4 @@ SERVICE_CHOICES = (
 	)
 
 IMMUNIZATION_CHOICES = tuple((vaccine, data['display_name']) for vaccine, data in EPSDT_REQUIREMENTS['immunization_schedule'].items())
-IMMUNIZATION_DOSES = { vaccine: data['total_doses'] for vaccine, data in EPSDT_REQUIREMENTS['immunization_schedule'].items() }
+IMMUNIZATION_DOSES = { vaccine: data['total_doses'] for vaccine, data in EPSDT_REQUIREMENTS['immunization_schedule'].items()}

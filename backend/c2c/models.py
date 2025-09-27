@@ -1,8 +1,10 @@
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import User
 from django.forms import ValidationError
 from multiselectfield import MultiSelectField
-from .constants import SERVICE_CHOICES, IMMUNIZATION_CHOICES, IMMUNIZATION_DOSES
+from .constants import SERVICE_CHOICES, IMMUNIZATION_CHOICES, IMMUNIZATION_DOSES, EPSDT_REQUIREMENTS
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 class Child(models.Model):
 	first_name = models.CharField(max_length=150)
@@ -38,17 +40,100 @@ class FosterPlacement(models.Model):
 
 	def __str__(self):
 		return f'Child Last Name: {self.child.last_name}, Foster Family: {self.foster_family.family_name}'
+
+def calculate_age_in_months(date_of_birth, reference_date=None):
+	if reference_date is None:
+		reference_date = datetime.now().date()
 	
+	if hasattr(date_of_birth, 'date'):
+		date_of_birth = date_of_birth.date()
+	if hasattr(reference_date, 'date'):
+		reference_date = reference_date.date()
+
+	delta_age = relativedelta(reference_date, date_of_birth)
+
+	return delta_age.years * 12 + delta_age.months
+
+class CaseManager(models.Manager):
+	@transaction.atomic
+	def create_case(self, child, caseworker, placement, status, start_date, end_date=None):
+		# Create the case instance and generate initial HealthService records
+		case = self.model(
+			child=child,
+			caseworker=caseworker,
+			placement=placement,
+			status=status,
+			start_date=start_date,
+			end_date=end_date
+		)
+		case.save()
+
+		# Create HealthService records for the 3-months following the case start_date
+		child = child
+		start_date = start_date
+		end_date = start_date + timedelta(days=91)
+
+		current_age_months = calculate_age_in_months(child.dob, start_date)
+		age_in_3months = current_age_months + 3
+		due_date_offset = 10 if current_age_months < 36 else 30
+
+		# Get well child visits in 3 month window
+		services_by_date = {}
+		for age in EPSDT_REQUIREMENTS['well_child_schedule']['age_in_months']:
+			if current_age_months < age <= age_in_3months:
+				due_date = child.dob + relativedelta(months=age) + timedelta(days=due_date_offset)
+				services_by_date[due_date] = {
+					'age_months': age,
+					'services': ['well_child'],
+					'immunizations': []
+				}
+
+		# Get Immunizaation requirements based on well child visits
+		for date, data in services_by_date.items():
+			age = data['age_months']
+
+			for vaccine, vaccine_data in EPSDT_REQUIREMENTS['immunization_schedule'].items():
+				for dose_info in vaccine_data:
+					if 'age_months' in dose_info and 'dose' in dose_info:
+						dose_ages = dose_info['age_months'] if isinstance(dose_info['age_months'], list) else [dose_info['age_months']]
+						if age in dose_ages:
+							if not ImmunizationRecord.objects.filter(
+								child=child,
+								vaccine_name=vaccine,
+								dose_number=int(dose_info['dose'][0]),
+							).exists():
+								data['immunizations'].append(vaccine)
+
+		# Create HealthService records for well child/immunization visits
+		for date, data in services_by_date.items():
+			new_service = HealthService.objects.create(
+				child = child,
+				service = data['services'],
+				immunizations = data['immunizations'],
+				due_date = date,
+				status='pending' 
+			)
+
+		# Add dental checup if child > 12 months of age
+		if current_age_months >= 12:
+			new_service = HealthService.objects.create(
+				child=child,
+				service=['dental'],
+				due_date = datetime.now.date() + timedelta(days=30),
+				status='pending'
+			)
+		
+		return case
+
 class Case(models.Model):
+	objects = CaseManager()
 	child = models.ForeignKey(Child, on_delete=models.CASCADE)
 	caseworker = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 	placement = models.ForeignKey(FosterPlacement, on_delete=models.SET_NULL, null=True, blank=True)
 	start_date = models.DateField()
 	end_date = models.DateField(null=True, blank=True)
-	status = models.CharField(choices=[('open', 'Open'), ('closed', 'Closed')])
-
-
-
+	status = models.CharField(choices=[('open', 'Open'), ('closed', 'Closed')])	
+	
 class HealthService(models.Model):	
 	child = models.ForeignKey(Child, on_delete=models.CASCADE)
 	service = MultiSelectField(choices=SERVICE_CHOICES, min_choices=1)

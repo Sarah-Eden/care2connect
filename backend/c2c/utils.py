@@ -1,27 +1,7 @@
 from django.db.models import Q
-import datetime
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 from .models import FosterPlacement, Case
-
-def calculate_age(date_of_birth):
-	today = datetime.datetime.now()
-	dob = datetime.datetime.strptime(date_of_birth, '%d/%m/%Y')
-
-	total_days = today - dob
-	print(total_days)
-
-	years = (total_days.total_seconds())/(365.25*24*3600)
-	yearsInt = int(abs(years))
-	
-	months = (years - yearsInt)*12
-	monthsInt = int(abs(months))
-
-	age_months = (yearsInt * 12) + monthsInt
-
-	return age_months
-
-	
-	 
-
 
 def get_accessible_child_ids(user):
 	if user.groups.filter(name='FosterParent').exists():

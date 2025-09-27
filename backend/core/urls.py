@@ -18,8 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework.routers import DefaultRouter
-from c2c.views import CreateUserView, UserViewSet, CaseViewSet, ChildViewSet, FosterFamilyViewSet, FosterPlacementViewSet, HealthServiceViewSet, ReminderLogViewSet, CustomTokenObtainPairView
-
+from c2c.views import UserViewSet, CaseViewSet, ChildViewSet, FosterFamilyViewSet, FosterPlacementViewSet, HealthServiceViewSet, ReminderLogViewSet, ImmunizationRecordViewset, CreateUserView, CustomTokenObtainPairView 
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
 router.register(r'cases', CaseViewSet, basename='case')
@@ -28,6 +27,7 @@ router.register(r'foster-families', FosterFamilyViewSet, basename='fosterfamily'
 router.register(r'foster-placements', FosterPlacementViewSet, basename='fosterplacement')
 router.register(r'health-services', HealthServiceViewSet, basename='healthservice')
 router.register(r'reminders', ReminderLogViewSet, basename='reminderlog')
+router.register(r'immunization-records', ImmunizationRecordViewset, basename='immunizationrecord')
 				
 urlpatterns = [
     path('admin/', admin.site.urls),

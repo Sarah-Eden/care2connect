@@ -43,7 +43,7 @@ class RbacApiTestCase(TestCase):
         self.family = FosterFamily.objects.create(family_name='TestFamily', parent1=self.fosterparent1_user)
         self.child = Child.objects.create(first_name='Test', last_name='Child', dob=timezone.now().date())
         self.placement = FosterPlacement.objects.create(child=self.child, foster_family=self.family, start_date=timezone.now().date())
-        self.case = Case.objects.create(
+        self.case = Case.objects.create_case(
             child=self.child, caseworker=self.caseworker_user, placement=self.placement,
             status='open', start_date=timezone.now().date()
         )

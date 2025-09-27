@@ -30,6 +30,16 @@ class CaseSerializer(serializers.ModelSerializer):
 		model=Case
 		fields = '__all__'
 	
+	def create(self, validated_data):
+		# Use custom CaseManager for creation
+		return Case.objects.create_case(**validated_data)
+
+	def update(self, instance, validated_data):
+		for attr, value in validated_data.items():
+			setattr(instance, attr, value)
+		instance.save()
+		return instance	
+	
 class ChildSerializer(serializers.ModelSerializer): 
 	class Meta:
 		model=Child
