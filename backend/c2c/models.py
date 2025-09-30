@@ -3,7 +3,8 @@ from django.contrib.auth.models import User
 from django.forms import ValidationError
 from multiselectfield import MultiSelectField
 from .constants import SERVICE_CHOICES, IMMUNIZATION_CHOICES, IMMUNIZATION_DOSES, EPSDT_REQUIREMENTS
-from datetime import datetime, timedelta
+from django.utils import timezone
+from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 
 class Child(models.Model):
@@ -43,7 +44,7 @@ class FosterPlacement(models.Model):
 
 def calculate_age_in_months(date_of_birth, reference_date=None):
 	if reference_date is None:
-		reference_date = datetime.now().date()
+		reference_date = timezone.now().date()
 	
 	if hasattr(date_of_birth, 'date'):
 		date_of_birth = date_of_birth.date()
@@ -114,12 +115,12 @@ class CaseManager(models.Manager):
 				status='pending' 
 			)
 
-		# Add dental checup if child > 12 months of age
+		# Add dental checkup if child > 12 months of age
 		if current_age_months >= 12:
 			new_service = HealthService.objects.create(
 				child=child,
 				service=['dental'],
-				due_date = datetime.now().date() + timedelta(days=30),
+				due_date = timezone.now().date() + timedelta(days=30),
 				status='pending'
 			)
 		
@@ -127,7 +128,7 @@ class CaseManager(models.Manager):
 
 class Case(models.Model):
 	objects = CaseManager()
-	child = models.ForeignKey(Child, on_delete=models.CASCADE)
+	child = models.ForeignKey(Child, on_delete=models.CASCADE, related_name='cases')
 	caseworker = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 	placement = models.ForeignKey(FosterPlacement, on_delete=models.SET_NULL, null=True, blank=True)
 	start_date = models.DateField()
@@ -143,6 +144,40 @@ class HealthService(models.Model):
 	status = models.CharField(choices=[('pending', 'Pending'), ('complete', 'Complete')])
 	created_date = models.DateTimeField(auto_now_add=True)
 	updated_date = models.DateTimeField(null=True, blank=True)
+
+	def __str__(self):
+		return f'{self.service} record for {self.child}, due on {self.due_date}'
+	def __repr__(self):
+		return f'<HealthService: {self.child.last_name}, {self.service}, {self.immunizations}, {self.due_date}'
+	
+	def save(self, *args, **kwargs):
+		super().save(*args, **kwargs)
+
+		# Automatically generate ImmunizationRecord instances when HealthService status marked complete
+		if self.status == 'complete' and self.completed_date:
+			for vaccine in self.immunizations or []:
+				vaccine_data = EPSDT_REQUIREMENTS['immunization_schedule'].get(vaccine)
+				if not vaccine_data:
+					continue
+
+				existing = ImmunizationRecord.objects.filter(child=self.child, vaccine_name=vaccine).order_by('-dose_number').first()
+				next_dose = (existing.dose_number + 1) if existing else 1
+				total = vaccine_data.get('total_doses', 0)
+			
+				if next_dose > total:
+					break
+				
+				record, created = ImmunizationRecord.objects.get_or_create(
+					child = self.child,
+					vaccine_name = vaccine,
+					dose_number = next_dose,
+					total_doses = total,
+					date_administered = self.completed_date
+				)
+
+				if not created:
+					print(f'Existing record found for {vaccine} dose #{next_dose}. Skipping create')
+
 
 class ImmunizationRecord(models.Model):
 	child = models.ForeignKey(Child, on_delete=models.CASCADE)

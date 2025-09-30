@@ -40,8 +40,8 @@ INSTALLED_APPS = [
 	'corsheaders',
 	'rest_framework_simplejwt',
 	'multiselectfield',
-	'c2c',
 	'django_q',
+	'c2c',
 ]
 
 MIDDLEWARE = [
@@ -89,15 +89,18 @@ DATABASES = {
     }
 }
 
-Q_Cluster = {
+Q_CLUSTER = {
 	'name': 'care2connect',
 	'workers': 4,
-	'timeout': 60,
-	'retry': 120,
+	'timeout': 300,
+	'retry': 360,
 	'queue_limit': 50,
 	'bulk': 10,
 	'orm': 'default',
 }
+
+# Email Config: console outputs to stdout, replace with smtp for production
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 SIMPLE_JWT = {
 	'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
