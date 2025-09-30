@@ -41,7 +41,7 @@ INSTALLED_APPS = [
 	'rest_framework_simplejwt',
 	'multiselectfield',
 	'c2c',
-	#'celery'
+	'django_q',
 ]
 
 MIDDLEWARE = [
@@ -87,6 +87,16 @@ DATABASES = {
 		'HOST': env('DATABASE_HOST'),
 		'PORT': env('DATABASE_PORT'),
     }
+}
+
+Q_Cluster = {
+	'name': 'care2connect',
+	'workers': 4,
+	'timeout': 60,
+	'retry': 120,
+	'queue_limit': 50,
+	'bulk': 10,
+	'orm': 'default',
 }
 
 SIMPLE_JWT = {

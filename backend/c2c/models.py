@@ -75,7 +75,7 @@ class CaseManager(models.Manager):
 
 		current_age_months = calculate_age_in_months(child.dob, start_date)
 		age_in_3months = current_age_months + 3
-		due_date_offset = 10 if current_age_months < 36 else 30
+		due_date_offset = 10 if current_age_months < 30 else 30
 
 		# Get well child visits in 3 month window
 		services_by_date = {}
@@ -119,7 +119,7 @@ class CaseManager(models.Manager):
 			new_service = HealthService.objects.create(
 				child=child,
 				service=['dental'],
-				due_date = datetime.now.date() + timedelta(days=30),
+				due_date = datetime.now().date() + timedelta(days=30),
 				status='pending'
 			)
 		
