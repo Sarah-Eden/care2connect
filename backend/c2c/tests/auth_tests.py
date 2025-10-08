@@ -10,11 +10,11 @@ class RbacApiTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
 
-        # call_command('setup_groups')
+        call_command('setup_groups')
 
-        self.supervisor_group, _ = Group.objects.get_or_create(name='Supervisor')
-        self.caseworker_group, _ = Group.objects.get_or_create(name='Caseworker')
-        self.fosterparent_group, _= Group.objects.get_or_create(name='FosterParent')
+        self.supervisor_group = Group.objects.get(name='Supervisor')
+        self.caseworker_group = Group.objects.get(name='Caseworker')
+        self.fosterparent_group = Group.objects.get(name='FosterParent')
 
         # Create test users
         self.supervisor_user = User.objects.create_user(
