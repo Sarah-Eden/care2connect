@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import logo from "../assets/C2C_Logo_no_bg.png";
 
-function Login() {
+export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -32,17 +32,17 @@ function Login() {
 
       // Will redirect to appropriate dashboard
       if (userGroups.includes("Supervisor")) {
-        navigate("/SupervisorDashboard");
+        navigate("/sup-dashboard");
       } else if (userGroups.includes("Caseworker")) {
-        navigate("/CaseworkerDashboard");
+        navigate("/cw-dashboard");
       } else if (userGroups.incluudes("FosterParent")) {
-        navigate("/FosterParentDashboard");
+        navigate("/fp-dashboard");
       } else {
         alert("No recognized role for account - redirecting to login.");
         navigate("/");
       }
     } catch (error) {
-      alert(error);
+      Alert(error);
     }
   };
 
@@ -117,5 +117,3 @@ function Login() {
     </Box>
   );
 }
-
-export default Login;

@@ -56,9 +56,10 @@ const theme = createTheme({
       disabled: "#7a7a7a",
     },
     background: {
-      default: "#f7f7f7",
+      default: "#bdbdbd",
       paper: "#ffffff",
     },
+    divider: "#bdbdbd",
   },
   typography: {
     fontFamily: "Roboto, sans-serif",
