@@ -16,33 +16,41 @@ import logo from "../assets/C2C_Logo_no_bg.png";
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     try {
       const res = await api.post("/api/token/", { username, password });
       console.log("Login response", res.data);
 
       const userGroups = res.data.groups || [];
+
       localStorage.setItem(ACCESS_TOKEN, res.data.access);
       localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
       localStorage.setItem(GROUPS, JSON.stringify(res.data.groups));
 
-      // Will redirect to appropriate dashboard
+      // Redirect to appropriate dashboard
       if (userGroups.includes("Supervisor")) {
         navigate("/sup-dashboard");
       } else if (userGroups.includes("Caseworker")) {
         navigate("/cw-dashboard");
-      } else if (userGroups.incluudes("FosterParent")) {
+      } else if (userGroups.includes("FosterParent")) {
         navigate("/fp-dashboard");
       } else {
         alert("No recognized role for account - redirecting to login.");
         navigate("/");
       }
     } catch (error) {
-      Alert(error);
+      console.error("Login failed:", error);
+      if (error.response?.status === 401) {
+        setError("Invalid username or password");
+      } else {
+        setError("Login failed. Please try again.");
+      }
     }
   };
 
@@ -81,6 +89,11 @@ export default function Login() {
           >
             Login
           </Typography>
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
           <form onSubmit={handleSubmit}>
             <TextField
               label="Username"

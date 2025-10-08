@@ -24,8 +24,15 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 		user = self.user
 		data['groups'] = [group.name for group in user.groups.all()]
 		return data
-	
+
+class ChildSerializer(serializers.ModelSerializer): 
+	class Meta:
+		model=Child
+		fields = '__all__'
+
 class CaseSerializer(serializers.ModelSerializer):
+	child = ChildSerializer(read_only=True)
+	
 	class Meta:
 		model=Case
 		fields = '__all__'
@@ -40,11 +47,6 @@ class CaseSerializer(serializers.ModelSerializer):
 		instance.save()
 		return instance	
 	
-class ChildSerializer(serializers.ModelSerializer): 
-	class Meta:
-		model=Child
-		fields = '__all__'
-
 class FosterFamilySerializer(serializers.ModelSerializer):
 	class Meta:
 		model=FosterFamily
