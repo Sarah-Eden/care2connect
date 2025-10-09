@@ -13,21 +13,27 @@ import {
   ListItemButton,
   Divider,
 } from "@mui/material";
-import api from "../api";
+import { getCases } from "../api";
 
 export default function CaseList({ onSelect }) {
   const [cases, setCases] = useState([]);
   const [filter, setFilter] = useState("");
   const [selectedId, setSelectedId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchCases = async () => {
       try {
-        const res = await api.get("/api/cases/");
-        if (!Array.isArray(res.data)) throw new Error("Invalid data format");
-        setCases(res.data);
+        setLoading(true);
+        setError(null);
+        const data = await getCases();
+        setCases(data);
       } catch (error) {
-        alert(error);
+        console.error("Error fetching cases:", error);
+        setError("Failed to load cases.");
+      } finally {
+        setLoading(false);
       }
     };
     fetchCases();
@@ -77,7 +83,7 @@ export default function CaseList({ onSelect }) {
         <List>
           {filteredCases.map((c) => (
             <>
-              <ListItem disblePadding fullWidth key={c.id}>
+              <ListItem disablePadding fullWidth key={c.id}>
                 <ListItemButton
                   selected={selectedId === c.id}
                   onClick={() => handleSelect(c)}

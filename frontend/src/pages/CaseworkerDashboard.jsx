@@ -2,21 +2,36 @@ import React, { useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
 import CaseList from "../components/CaseList";
 import DetailView from "../components/DetailView";
-import NewCaseForm from "../components/NewCaseForm";
-import Notifications from "../components/Notifications";
-import logo from "../assets/C2C_Logo_no_bg.png";
-import api from "../api";
+import Navigation from "../components/Navigation";
 
 export default function CaseworkerDashboard() {
-  const [activeView, setActiveView] = useState({ type: "detail", data: null });
+  const [activeForm, setActiveForm] = useState(null);
   const [selectedCase, setSelectedCase] = useState(null);
+
+  const handleFormSelect = (formType) => {
+    setActiveForm(formType);
+    setSelectedCase(null);
+  };
+
+  const handleCaseSelect = (caseData) => {
+    setSelectedCase(caseData);
+    setActiveForm(null);
+  };
 
   return (
     <DashboardLayout
       role="Caseworker"
-      caseList={<CaseList onSelect={setSelectedCase} />}
-      detailView={<DetailView selectedCase={selectedCase} />}
-      notifications={<Notifications />}
+      navigation={
+        <Navigation role="Caseworker" onFormSelect={handleFormSelect} />
+      }
+      caseList={<CaseList onSelect={handleCaseSelect} />}
+      detailView={
+        <DetailView
+          selectedCase={selectedCase}
+          activeForm={activeForm}
+          onCloseForm={() => setActiveForm(null)}
+        />
+      }
     />
   );
 }

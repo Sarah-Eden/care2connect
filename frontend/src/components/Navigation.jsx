@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Box, Button, List, ListItem } from "@mui/material";
 import logo from "../assets/C2C_Logo_no_bg.png";
 
-export default function Navigation({ role }) {
+export default function Navigation({ role, onFormSelect }) {
   const buttons =
     {
       Supervisors: [
@@ -23,14 +23,17 @@ export default function Navigation({ role }) {
 
   return (
     <Box sx={{ p: 2 }}>
-      <img
-        src={logo}
-        alt="Care2Connect Logo"
-        style={{
-          width: "100%",
-          mb: 2,
-        }}
-      />
+      <Box sx={{ textAlign: "center", mb: 2 }}>
+        <img
+          src={logo}
+          alt="Care2Connect Logo"
+          style={{
+            width: "100%",
+            mb: 2,
+          }}
+        />
+      </Box>
+
       {buttons.map((btn) => (
         <Button
           key={btn.formType}
