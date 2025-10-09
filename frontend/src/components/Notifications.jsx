@@ -6,6 +6,7 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  Alert,
 } from "@mui/material";
 import {
   getUpcomingHealthServiceRecords,
@@ -15,13 +16,11 @@ import {
 export default function Notifications() {
   const [upcomingServces, setUpcomingServices] = useState([]);
   const [overdueServices, setOverdueServices] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        setLoading(true);
         setError(null);
 
         const [upcoming, overdue] = await Promise.all([
@@ -40,13 +39,12 @@ export default function Notifications() {
       } catch (error) {
         console.error("Error fetching notifications:", error);
         setError("Failed to load notifications");
-      } finally {
-        setLoading(false);
       }
     };
     fetchNotifications();
   }, []);
 
+  // Function to format HealthsService type for Notification display
   const formatServiceType = (serviceArray) => {
     if (!serviceArray || serviceArray.length === 0) return "Service";
 
@@ -78,6 +76,9 @@ export default function Notifications() {
       <Typography variant="h6" gutterBottom textAlign="center">
         Notifications
       </Typography>
+
+      {/* Display error if database get fails */}
+      {error !== null && <Alert severity="error">{error}</Alert>}
 
       {/* Overdue services */}
       {overdueServices.length > 0 && (

@@ -4,7 +4,7 @@ import CaseList from "../components/CaseList";
 import DetailView from "../components/DetailView";
 import Navigation from "../components/Navigation";
 
-export default function CaseworkerDashboard() {
+export default function Dashboard() {
   const [activeForm, setActiveForm] = useState(null);
   const [selectedCase, setSelectedCase] = useState(null);
 

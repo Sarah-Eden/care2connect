@@ -33,16 +33,19 @@ export default function Login() {
       localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
       localStorage.setItem(GROUPS, JSON.stringify(res.data.groups));
 
+      navigate("/dashboard");
+
       // Redirect to appropriate dashboard
-      if (userGroups.includes("Supervisor")) {
-        navigate("/sup-dashboard");
-      } else if (userGroups.includes("Caseworker")) {
-        navigate("/cw-dashboard");
-      } else if (userGroups.includes("FosterParent")) {
-        navigate("/fp-dashboard");
+      if (
+        userGroups.some((group) =>
+          ["Supervisor", "Caseworker", "FosterParent"].includes(group)
+        )
+      ) {
+        navigate("/dashboard");
       } else {
         alert("No recognized role for account - redirecting to login.");
-        navigate("/");
+        localStorage.clear();
+        navigate("/login");
       }
     } catch (error) {
       console.error("Login failed:", error);

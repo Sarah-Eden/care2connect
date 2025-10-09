@@ -5,10 +5,23 @@ import SupervisorDashboard from "./pages/SupervisorDashboard";
 import CaseworkerDashboard from "./pages/CaseworkerDashboard";
 import FosterParentDashboard from "./pages/FosterParentDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Dashboard from "./pages/Dashboard";
+import { GROUPS } from "./constants";
 
 function Logout() {
   localStorage.clear();
   return <Navigate to="/login" />;
+}
+
+function RoleDashboard() {
+  const groups = JSON.parse(localStorage.getItem(GROUPS) || "[]");
+  const role = groups[0];
+
+  if (!role) {
+    return <Navigate to="/login" />;
+  }
+
+  return <Dashboard role={role} />;
 }
 
 function App() {
@@ -18,26 +31,10 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route
-          path="/sup-dashboard"
+          path="/dashboard"
           element={
             <ProtectedRoute>
-              <SupervisorDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/cw-dashboard"
-          element={
-            <ProtectedRoute>
-              <CaseworkerDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/fp-dashboard"
-          element={
-            <ProtectedRoute>
-              <FosterParentDashboard />
+              <Dashboard />
             </ProtectedRoute>
           }
         />
