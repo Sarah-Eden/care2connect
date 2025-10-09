@@ -153,7 +153,11 @@ EPSDT_REQUIREMENTS = {
 		'COVID_aPS': {
 			'display_name': 'COVID-19 (1vCOV-aPS)',
 			'total_doses': 0
-		}, 
+		},
+		'None': {
+			'display_name': 'None',
+			'total_doses': 0
+		} 
 	},
 
 	'dental': {

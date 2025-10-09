@@ -74,7 +74,7 @@ export default function DashboardLayout({
               sx={{
                 width: "100%",
                 height: "100%",
-                backgroundColor: "#f7f7f7",
+                backgroundColor: "#ffffff",
               }}
             >
               {detailView}

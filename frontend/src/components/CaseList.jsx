@@ -83,7 +83,7 @@ export default function CaseList({ onSelect }) {
         <List>
           {filteredCases.map((c) => (
             <>
-              <ListItem disablePadding fullWidth key={c.id}>
+              <ListItem disablePadding key={c.id}>
                 <ListItemButton
                   selected={selectedId === c.id}
                   onClick={() => handleSelect(c)}

@@ -79,7 +79,7 @@ export default function DetailView({ selectedCase, activeForm, onCloseForm }) {
 
           <Grid item size={{ xs: 12 }}>
             <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-              Allergies
+              Medications
             </Typography>
             <Typography variant="body1">
               {child.medications || "None Listed"}

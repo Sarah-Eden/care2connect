@@ -58,6 +58,7 @@ class FosterPlacementSerializer(serializers.ModelSerializer):
 		fields = '__all__'
 
 class HealthServiceSerializer(serializers.ModelSerializer):
+	child=ChildSerializer(read_only=True)
 	class Meta:
 		model=HealthService
 		fields = '__all__'

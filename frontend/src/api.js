@@ -292,18 +292,40 @@ export const getReminderLogs = async () => {
 };
 
 // Helper functions
-
 // Get all health service records due in the next 30 days
 export const getUpcomingHealthServiceRecords = async () => {
   try {
     const allServices = await getHealthServiceRecords();
     const today = new Date();
-    const thirtyDaysFromToday = new Date(today.getDate() + 30);
+    today.setHours(0, 0, 0, 0);
+    const thirtyDaysFromToday = new Date(
+      today.getTime() + 30 * 24 * 60 * 60 * 1000
+    );
 
-    return allServices.filter((service) => {
+    // Debug
+    console.log("=== getUpcomingHealthServiceRecords Debug ===");
+    console.log("All services:", allServices);
+    console.log("Today:", today);
+    console.log("30 days from now", thirtyDaysFromToday);
+
+    const filtered = allServices.filter((service) => {
       const dueDate = new Date(service.due_date);
-      return service.status === "pending" && dueDate <= thirtyDaysFromToday;
+      const isPending = service.status === "pending";
+      const isWithin30Days = dueDate >= today && dueDate <= thirtyDaysFromToday;
+
+      console.log(`Service ${service.id}:`, {
+        due_date: service.due_date,
+        dueDate,
+        status: service.status,
+        isPending,
+        isWithin30Days,
+        willInclude: isPending && isWithin30Days,
+      });
+      return isPending && isWithin30Days;
     });
+
+    console.log("Filtered upcoming services", filtered);
+    return filtered;
   } catch (error) {
     console.error("Error fetching upcoming health services:", error);
     throw error;
@@ -315,6 +337,7 @@ export const getOverdueHealthServiceRecords = async () => {
   try {
     const allServices = await getHealthServiceRecords();
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     return allServices.filter((service) => {
       const dueDate = new Date(service.due_date);
