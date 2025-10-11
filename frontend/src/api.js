@@ -99,6 +99,7 @@ export const getCase = async (id) => {
 export const createCase = async (caseData) => {
   try {
     const res = await api.post("/api/cases/", caseData);
+
     return res.data;
   } catch (error) {
     console.error("Error creating case: ", error);
@@ -287,6 +288,40 @@ export const getReminderLogs = async () => {
     return res.data;
   } catch (error) {
     console.error("Error fetching reminder logs: ", error);
+    throw error;
+  }
+};
+
+// Users
+export const getUsers = async () => {
+  try {
+    const res = await api.get("/api/users/");
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    throw error;
+  }
+};
+
+export const getUser = async (id) => {
+  if (!id) throw new Error("User ID is required.");
+  try {
+    const res = await api.get(`/api/users/${id}`);
+    return res.data;
+  } catch (error) {
+    console.error(`Error fetching user ${id}:`, error);
+    throw error;
+  }
+};
+
+// Get users filtered by group
+// @param {string} groupName - 'Supervisor', 'Caseworker', or 'FosterParent'
+export const getUsersByGroup = async (groupName) => {
+  try {
+    const res = await api.get(`/api/users/?group=${groupName}`);
+    return res.data;
+  } catch (error) {
+    console.error(`Error fetching users in group ${groupName}:`, error);
     throw error;
   }
 };

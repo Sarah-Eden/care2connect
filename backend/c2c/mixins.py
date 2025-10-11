@@ -32,13 +32,14 @@ class RoleBasedQuerySetMixin(ViewSetMixin):
 		accessible_child_ids = get_accessible_child_ids(user)
 		accessible_placement_ids = get_accessible_placement_ids(user)
 
-		if not accessible_case_ids:
+		if not accessible_case_ids and model != Child:
 			return model.objects.none()
 		
+		if model == Child or model == User:
+			return model.objects.all()
 		# Map models to their filtering logic
 		filters = {
 			Case: {'id__in': accessible_case_ids},
-			Child: {'id__in': accessible_child_ids},
 			FosterPlacement: {'id__in': accessible_placement_ids},
 			HealthService: {'child_id__in': accessible_child_ids},
 			ImmunizationRecord: {'child_id__in':accessible_child_ids},

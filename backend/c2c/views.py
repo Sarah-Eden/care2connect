@@ -12,6 +12,16 @@ class UserViewSet(RoleBasedQuerySetMixin, viewsets.ModelViewSet):
 	model = User
 	permission_classes = [IsAuthenticated, RoleBasedObjectPermissions]
 
+	def get_queryset(self):
+		queryset = super().get_queryset()
+
+		# Filter users by group
+		group_name = self.request.query_params.get('group', None)
+		if group_name:
+			queryset = queryset.filter(groups__name=group_name).distinct()
+		
+		return queryset
+
 class CaseViewSet(RoleBasedQuerySetMixin, viewsets.ModelViewSet):
 	queryset = Case.objects.all()
 	serializer_class = CaseSerializer

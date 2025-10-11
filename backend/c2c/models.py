@@ -57,7 +57,7 @@ def calculate_age_in_months(date_of_birth, reference_date=None):
 
 class CaseManager(models.Manager):
 	@transaction.atomic
-	def create_case(self, child, caseworker, placement, status, start_date, end_date=None):
+	def create_case(self, child, caseworker, status, start_date, placement=None, end_date=None):
 		# Create the case instance and generate initial HealthService records
 		case = self.model(
 			child=child,

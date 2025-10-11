@@ -41,9 +41,6 @@ class RoleBasedObjectPermissions(ModelPermissionsWithView):
 		if isinstance(obj, Case):
 			return obj.id in accessible_case_ids
 		
-		if isinstance(obj, Child):
-			return Case.objects.filter(id__in=accessible_case_ids, child=obj).exists()
-		
 		if isinstance(obj, (HealthService, ImmunizationRecord)):
 			return Case.objects.filter(id__in=accessible_case_ids, child=obj.child).exists()
 		

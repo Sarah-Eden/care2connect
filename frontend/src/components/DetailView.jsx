@@ -1,10 +1,25 @@
 import React from "react";
-import { Box, Typography, Grid, Divider, IconButton } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Grid,
+  Divider,
+  IconButton,
+  Button,
+  Card,
+  CardContent,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import EditIcon from "@mui/icons-material/Edit";
 import NewCaseForm from "./NewCaseForm";
 import NewPlacementForm from "./NewPlacementForm";
 
-export default function DetailView({ selectedCase, activeForm, onCloseForm }) {
+export default function DetailView({
+  selectedCase,
+  activeForm,
+  onCloseForm,
+  onCaseCreated,
+}) {
   if (activeForm) {
     return (
       <Box sx={{ p: 2 }}>
@@ -30,7 +45,9 @@ export default function DetailView({ selectedCase, activeForm, onCloseForm }) {
         </Box>
 
         {/*Render appropriate form */}
-        {activeForm === "add_case" && <NewCaseForm onClose={onCloseForm} />}
+        {activeForm === "add_case" && (
+          <NewCaseForm onClose={onCloseForm} onSuccess={onCaseCreated} />
+        )}
         {activeForm === "add_placement" && (
           <NewPlacementForm onClose={onCloseForm} />
         )}
@@ -38,6 +55,9 @@ export default function DetailView({ selectedCase, activeForm, onCloseForm }) {
     );
   }
 
+  {
+    /* Show case details for Child selcted from list */
+  }
   if (selectedCase) {
     const child = selectedCase.child;
 
@@ -55,7 +75,7 @@ export default function DetailView({ selectedCase, activeForm, onCloseForm }) {
               Date of Birth
             </Typography>
             <Typography variant="body1">
-              {new Date(child.dob).toLocaleDateString()}
+              {new Date(child.dob + "T12:00:00").toLocaleDateString("en-US")}
             </Typography>
           </Grid>
 

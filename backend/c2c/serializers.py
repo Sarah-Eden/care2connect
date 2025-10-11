@@ -38,8 +38,17 @@ class CaseSerializer(serializers.ModelSerializer):
 		fields = '__all__'
 	
 	def create(self, validated_data):
+		child_id = self.initial_data.get('child')
+
+		if not child_id:
+			raise serializers.ValidationError({'child': 'Invalid child ID.'})
+		
+		try:
+			child = Child.objects.get(id=child_id)
+		except Child.DoesNotExist:
+			raise serializers.ValidationError({'child': 'Invalid child ID.'})
 		# Use custom CaseManager for creation
-		return Case.objects.create_case(**validated_data)
+		return Case.objects.create_case(child=child, **validated_data)
 
 	def update(self, instance, validated_data):
 		for attr, value in validated_data.items():

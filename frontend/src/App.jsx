@@ -1,9 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
-import SupervisorDashboard from "./pages/SupervisorDashboard";
-import CaseworkerDashboard from "./pages/CaseworkerDashboard";
-import FosterParentDashboard from "./pages/FosterParentDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import { GROUPS } from "./constants";

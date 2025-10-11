@@ -12,32 +12,29 @@ import {
   InputLabel,
   ListItemButton,
   Divider,
+  Alert,
 } from "@mui/material";
 import { getCases } from "../api";
 
-export default function CaseList({ onSelect }) {
+export default function CaseList({ onSelect, refresh }) {
   const [cases, setCases] = useState([]);
   const [filter, setFilter] = useState("");
   const [selectedId, setSelectedId] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchCases = async () => {
       try {
-        setLoading(true);
         setError(null);
         const data = await getCases();
         setCases(data);
       } catch (error) {
         console.error("Error fetching cases:", error);
         setError("Failed to load cases.");
-      } finally {
-        setLoading(false);
       }
     };
     fetchCases();
-  }, []);
+  }, [refresh]);
 
   const filteredCases = cases.filter((c) =>
     `${c.child.first_name} ${c.child.last_name}`
@@ -54,6 +51,7 @@ export default function CaseList({ onSelect }) {
     <Box sx={{ p: { xs: 1, sm: 2, textAlign: "center" } }}>
       <Typography variant="h6">Assigned Cases</Typography>
 
+      {/* Mobile drop down */}
       <Box sx={{ display: { xs: "block", sm: "block", md: "none" } }}>
         <FormControl fullWidth>
           <InputLabel>Select Case</InputLabel>
@@ -72,6 +70,7 @@ export default function CaseList({ onSelect }) {
         </FormControl>
       </Box>
 
+      {/* Desktop list */}
       <Box sx={{ display: { xs: "none", sm: "none", md: "block" } }}>
         <TextField
           label="Filter"

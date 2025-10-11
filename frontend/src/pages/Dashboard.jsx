@@ -7,6 +7,7 @@ import Navigation from "../components/Navigation";
 export default function Dashboard() {
   const [activeForm, setActiveForm] = useState(null);
   const [selectedCase, setSelectedCase] = useState(null);
+  const [caseRefresh, setCaseRefresh] = useState(0);
 
   const handleFormSelect = (formType) => {
     setActiveForm(formType);
@@ -24,12 +25,13 @@ export default function Dashboard() {
       navigation={
         <Navigation role="Caseworker" onFormSelect={handleFormSelect} />
       }
-      caseList={<CaseList onSelect={handleCaseSelect} />}
+      caseList={<CaseList onSelect={handleCaseSelect} refresh={caseRefresh} />}
       detailView={
         <DetailView
           selectedCase={selectedCase}
           activeForm={activeForm}
           onCloseForm={() => setActiveForm(null)}
+          onCaseCreated={() => setCaseRefresh((prev) => prev + 1)}
         />
       }
     />
