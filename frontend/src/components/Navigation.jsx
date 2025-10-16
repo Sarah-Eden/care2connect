@@ -4,9 +4,10 @@ import logo from "../assets/C2C_Logo_no_bg.png";
 export default function Navigation({ role, onFormSelect }) {
   const buttons =
     {
-      Supervisors: [
+      Supervisor: [
+        { label: "Add User", formType: "add_user" },
         { label: "Add Child", formType: "add_child" },
-        { Label: "Add Foster Family", formType: "add_foster_family" },
+        { label: "Add Foster Family", formType: "add_foster_family" },
         { label: "Add Case", formType: "add_case" },
         { label: "Add Placement", formType: "add_placement" },
       ],
