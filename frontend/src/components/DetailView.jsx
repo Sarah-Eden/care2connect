@@ -13,6 +13,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import NewCaseForm from "./NewCaseForm";
 import NewPlacementForm from "./NewPlacementForm";
+import NewChildForm from "./NewChildForm";
+import NewFosterFamilyForm from "./NewFosterFamily";
 
 export default function DetailView({
   selectedCase,
@@ -50,6 +52,10 @@ export default function DetailView({
         )}
         {activeForm === "add_placement" && (
           <NewPlacementForm onClose={onCloseForm} />
+        )}
+        {activeForm === "add_child" && <NewChildForm onClose={onCloseForm} />}
+        {activeForm === "add_foster_family" && (
+          <NewFosterFamilyForm onClose={onCloseForm} />
         )}
       </Box>
     );
