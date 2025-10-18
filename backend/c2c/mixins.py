@@ -1,6 +1,7 @@
 from rest_framework.viewsets import ViewSetMixin
+from django.db.models import Q
 from django.contrib.auth.models import User
-from .models import Case, Child, FosterPlacement, HealthService, ImmunizationRecord, ReminderLog
+from .models import Case, Child, FosterFamily, FosterPlacement, HealthService, ImmunizationRecord, ReminderLog
 from .utils import get_accessible_case_ids, get_accessible_child_ids, get_accessible_placement_ids
 
 # Mixin to filter querysets based on user role. Permissions are checked by RoleBasedObject permissions
@@ -35,8 +36,9 @@ class RoleBasedQuerySetMixin(ViewSetMixin):
 		if not accessible_case_ids and model != Child:
 			return model.objects.none()
 		
-		if model == Child or model == User:
+		if model == Child or model == User or model == FosterFamily:
 			return model.objects.all()
+		
 		# Map models to their filtering logic
 		filters = {
 			Case: {'id__in': accessible_case_ids},
@@ -55,6 +57,18 @@ class RoleBasedQuerySetMixin(ViewSetMixin):
 		if not accessible_child_ids:
 			return model.objects.none()
 		
+		if model == FosterFamily:
+			return model.objects.filter(
+				Q(parent1=user) |  Q(parent2=user)
+			).distinct()
+		
+		if model == User:
+			caseworker_ids = Case.objects.filter(
+				child_id__in = accessible_child_ids,
+				status='open'
+			).values_list('caseworker_id', flat=True).distinct()
+			return model.objects.filter(id__in=caseworker_ids)
+		
 		# Map models to filtering logic
 		filters = {
 			Child: {'id__in': accessible_child_ids},
@@ -62,6 +76,7 @@ class RoleBasedQuerySetMixin(ViewSetMixin):
 			HealthService: {'child_id__in': accessible_child_ids},
 			ImmunizationRecord: {'child_id__in': accessible_child_ids},
 			ReminderLog: {'service__child_id__in': accessible_child_ids},
+			FosterPlacement: {'child_id__in': accessible_child_ids},
 		}
 
 		filter_kwargs = filters.get(model)

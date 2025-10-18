@@ -59,7 +59,7 @@ class ReminderLogViewSet(RoleBasedQuerySetMixin, viewsets.ModelViewSet):
 	permission_classes = [IsAuthenticated, RoleBasedObjectPermissions]
 
 class ImmunizationRecordViewset(RoleBasedQuerySetMixin, viewsets.ModelViewSet):
-	queryset = ImmunizationRecord
+	queryset = ImmunizationRecord.objects.all()
 	serializer_class = ImmunizationRecordSerializer
 	model = ImmunizationRecord
 	permission_classes = [IsAuthenticated, RoleBasedObjectPermissions]

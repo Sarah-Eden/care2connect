@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User, Group
 from .models import Case, Child, FosterFamily, FosterPlacement, HealthService, ReminderLog, ImmunizationRecord
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .constants import IMMUNIZATION_DOSES
+from .constants import IMMUNIZATION_DOSES, SERVICE_CHOICES, IMMUNIZATION_CHOICES
 
 class UserSerializer(serializers.ModelSerializer):
 	groups = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all(), many=True, required=True)
@@ -68,6 +68,8 @@ class FosterPlacementSerializer(serializers.ModelSerializer):
 
 class HealthServiceSerializer(serializers.ModelSerializer):
 	child=ChildSerializer(read_only=True)
+	service = serializers.MultipleChoiceField(choices=SERVICE_CHOICES)
+	immunizations = serializers.MultipleChoiceField(choices=IMMUNIZATION_CHOICES)
 	class Meta:
 		model=HealthService
 		fields = '__all__'

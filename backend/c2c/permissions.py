@@ -1,5 +1,6 @@
 from rest_framework.permissions import BasePermission, DjangoModelPermissions, SAFE_METHODS
-from .models import Child, Case, FosterPlacement, HealthService, ImmunizationRecord, ReminderLog
+from django.contrib.auth.models import User
+from .models import Child, Case, FosterFamily, FosterPlacement, HealthService, ImmunizationRecord, ReminderLog
 from .utils import get_accessible_case_ids, get_accessible_child_ids
 
 class ModelPermissionsWithView(DjangoModelPermissions):
@@ -38,6 +39,9 @@ class RoleBasedObjectPermissions(ModelPermissionsWithView):
 		if not accessible_case_ids:
 			return False
 		
+		if isinstance(obj, User):
+			return True
+		
 		if isinstance(obj, Case):
 			return obj.id in accessible_case_ids
 		
@@ -46,6 +50,9 @@ class RoleBasedObjectPermissions(ModelPermissionsWithView):
 		
 		if isinstance(obj, FosterPlacement):
 			return Case.objects.filter(id__in=accessible_case_ids, child=obj.child).exists()
+		
+		if isinstance(obj, FosterFamily):
+			return True
 		
 		if isinstance(obj, ReminderLog):
 			if obj.service and obj.service.child:
@@ -68,6 +75,16 @@ class RoleBasedObjectPermissions(ModelPermissionsWithView):
 		
 		if isinstance(obj, Case):
 			return obj.child.id in accessible_child_ids and request.method in SAFE_METHODS
+		
+		if isinstance(obj, FosterPlacement):
+			return obj.child in accessible_child_ids and request.method in SAFE_METHODS
+		
+		if isinstance(obj, FosterFamily):
+			return (obj.parent1 == user or obj.parent2 == user) and request.method in SAFE_METHODS
+		
+		if isinstance(obj, User):
+			assigned_caseworker = Case.objects.filter(child_id__in=accessible_child_ids, caseworker=obj, status='open')
+			return assigned_caseworker.exists() and request.method in SAFE_METHODS
 		
 		if isinstance(obj, ReminderLog):
 			if obj.service and obj.service.child:

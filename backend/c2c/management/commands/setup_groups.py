@@ -92,6 +92,10 @@ class Command(BaseCommand):
 			Permission.objects.get(codename='view_child', content_type=child_type),
 			# Case model permissions
 			Permission.objects.get(codename='view_case', content_type=case_type),
+			# FosterFamily model permissions
+			Permission.objects.get(codename='view_fosterfamily', content_type=family_type),
+			# FosterPlacement model permissions
+			Permission.objects.get(codename='view_fosterplacement', content_type=placement_type),
 			# HealthService model permissions
 			Permission.objects.get(codename='change_healthservice', content_type=health_type),
 			Permission.objects.get(codename='view_healthservice', content_type=health_type),

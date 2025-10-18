@@ -1,4 +1,5 @@
 from django.db import models, transaction
+from django.db.models import Q, UniqueConstraint
 from django.contrib.auth.models import User
 from django.forms import ValidationError
 from multiselectfield import MultiSelectField
@@ -16,6 +17,7 @@ class Child(models.Model):
 
 	class Meta:
 		verbose_name_plural = 'children'
+		unique_together = ('first_name', 'last_name', 'dob')
 
 	def __str__(self):
 		return f'{self.last_name}, {self.first_name}'
@@ -29,6 +31,7 @@ class FosterFamily(models.Model):
 
 	class Meta:
 		verbose_name_plural = 'FosterFamilies'
+		
 	def __str__(self):
 		return self.family_name
 
@@ -38,6 +41,15 @@ class FosterPlacement(models.Model):
 	start_date = models.DateField()
 	end_date = models.DateField(blank=True, null=True)
 	end_reason = models.TextField(null=True, blank=True)
+
+	class Meta:
+		constraints = [
+			UniqueConstraint(
+				fields=['child'],
+				condition=Q(end_date__isnull=True),
+				name='unique_active_placement'
+			)
+		]
 
 	def __str__(self):
 		return f'Child Last Name: {self.child.last_name}, Foster Family: {self.foster_family.family_name}'
@@ -134,6 +146,15 @@ class Case(models.Model):
 	start_date = models.DateField()
 	end_date = models.DateField(null=True, blank=True)
 	status = models.CharField(choices=[('open', 'Open'), ('closed', 'Closed')])	
+
+	class Meta:
+		constraints=[
+			UniqueConstraint(
+				fields=['child'],
+				condition=Q(status='open'),
+				name='unique_open_case'
+			)
+		]
 	
 class HealthService(models.Model):	
 	child = models.ForeignKey(Child, on_delete=models.CASCADE)
