@@ -23,6 +23,7 @@ export default function CaseList({ onSelect, refresh }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    console.log("CaseList useEffect triggered refresh value:", refresh);
     const fetchCases = async () => {
       try {
         setError(null);

@@ -35,6 +35,8 @@ export default function DetailView({
   activeForm,
   onCloseForm,
   onCaseCreated,
+  onDetailUpdated,
+  refresh,
 }) {
   const [fosterPlacementDetails, setFosterPlacementDetails] = useState(null);
   const [fosterFamilyDetails, setFosterFamilyDetails] = useState(null);
@@ -95,7 +97,7 @@ export default function DetailView({
       }
     };
     fetchAdditionalData();
-  }, [selectedCase]);
+  }, [selectedCase, refresh]);
 
   if (activeForm) {
     return (
@@ -126,7 +128,7 @@ export default function DetailView({
           <NewCaseForm onClose={onCloseForm} onSuccess={onCaseCreated} />
         )}
         {activeForm === "add_placement" && (
-          <NewPlacementForm onClose={onCloseForm} />
+          <NewPlacementForm onClose={onCloseForm} onSuccess={onDetailUpdated} />
         )}
         {activeForm === "add_child" && <NewChildForm onClose={onCloseForm} />}
         {activeForm === "add_foster_family" && (
@@ -278,7 +280,7 @@ export default function DetailView({
                 onClose={() => setEditSection(null)}
                 onSuccess={() => {
                   setEditSection(null);
-                  if (onCaseCreated) onCaseCreated();
+                  if (onDetailUpdated) onDetailUpdated();
                 }}
               />
             ) : (
@@ -379,7 +381,7 @@ export default function DetailView({
               </Typography>
             )}
             {editingServiceId && (
-              <Box sx={{ m5: 2 }}>
+              <Box sx={{ mb: 2 }}>
                 <UpdateHealthServiceForm
                   healthService={healthServices.find(
                     (s) => s.id === editingServiceId
@@ -387,6 +389,7 @@ export default function DetailView({
                   onClose={() => setEditingServiceId(null)}
                   onSuccess={() => {
                     setEditingServiceId(null);
+                    if (onDetailUpdated) onDetailUpdated();
                   }}
                 />
               </Box>

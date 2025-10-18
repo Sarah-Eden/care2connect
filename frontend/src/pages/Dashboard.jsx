@@ -9,6 +9,7 @@ export default function Dashboard() {
   const [activeForm, setActiveForm] = useState(null);
   const [selectedCase, setSelectedCase] = useState(null);
   const [caseRefresh, setCaseRefresh] = useState(0);
+  const [detailRefresh, setDetailRefresh] = useState(0);
   const [userRole, setUserRole] = useState(null);
 
   // Get user role on page load
@@ -27,6 +28,14 @@ export default function Dashboard() {
     setActiveForm(null);
   };
 
+  const handleCaseRefresh = () => {
+    setCaseRefresh((prev) => prev + 1);
+  };
+
+  const handleDetailRefresh = () => {
+    setDetailRefresh((prev) => prev + 1);
+  };
+
   return (
     <DashboardLayout
       role={userRole}
@@ -39,7 +48,9 @@ export default function Dashboard() {
           selectedCase={selectedCase}
           activeForm={activeForm}
           onCloseForm={() => setActiveForm(null)}
-          onCaseCreated={() => setCaseRefresh((prev) => prev + 1)}
+          onCaseCreated={handleCaseRefresh}
+          onDetailUpdated={handleDetailRefresh}
+          refresh={detailRefresh}
         />
       }
     />
