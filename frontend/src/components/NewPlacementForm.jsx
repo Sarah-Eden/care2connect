@@ -27,7 +27,7 @@ export default function NewPlacementForm({ onClose, onSuccess }) {
   const {
     control,
     handleSubmit,
-    formState: { errors, isSumbitting },
+    formState: { errors, isSubmitting },
     reset,
   } = useForm({
     defaultValues: {
@@ -117,7 +117,7 @@ export default function NewPlacementForm({ onClose, onSuccess }) {
                             <MenuItem disabled>Loading...</MenuItem>
                           ) : (
                             fosterFamilies.map((family) => (
-                              <MenuItem ey={family.id} value={family.id}>
+                              <MenuItem key={family.id} value={family.id}>
                                 {family.family_name}
                               </MenuItem>
                             ))
@@ -167,7 +167,7 @@ export default function NewPlacementForm({ onClose, onSuccess }) {
                 reset();
                 onClose();
               }}
-              disabled={isSumbitting}
+              disabled={isSubmitting}
             >
               Cancel
             </Button>
@@ -175,7 +175,7 @@ export default function NewPlacementForm({ onClose, onSuccess }) {
               type="submit"
               variant="contained"
               color="primary"
-              disabled={isSumbitting}
+              disabled={isSubmitting}
             >
               Submit
             </Button>

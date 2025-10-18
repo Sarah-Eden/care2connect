@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -216,7 +216,7 @@ export default function ChildSearch({
             <Box sx={{ display: { xs: "none", sm: "none", md: "block" } }}>
               <List>
                 {searchResults.map((c) => (
-                  <>
+                  <React.Fragment key={c.id}>
                     <ListItem disablePadding key={c.id}>
                       <ListItemButton
                         onClick={() => handleSelectChild(c)}
@@ -236,7 +236,7 @@ export default function ChildSearch({
                       </ListItemButton>
                     </ListItem>
                     <Divider />
-                  </>
+                  </React.Fragment>
                 ))}
               </List>
             </Box>

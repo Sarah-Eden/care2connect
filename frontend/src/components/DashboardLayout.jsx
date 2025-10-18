@@ -83,7 +83,10 @@ export default function DashboardLayout({
 
           {/* Notifications Panel (Grid Column 4) */}
           <Grid item size={{ xs: 12, md: 2 }}>
-            <Paper elevation={3} sx={{ width: "100%", height: "100%" }}>
+            <Paper
+              elevation={3}
+              sx={{ width: "100%", height: "100%", backgroundColor: "#f7f7f7" }}
+            >
               <Notifications />
             </Paper>
           </Grid>

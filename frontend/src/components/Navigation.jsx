@@ -15,10 +15,6 @@ export default function Navigation({ role, onFormSelect }) {
         { label: "Add Case", formType: "add_case" },
         { label: "Add Placement", formType: "add_placement" },
       ],
-      FosterParent: [
-        { label: "Enter Health Visit", formType: "enter_health_visit" },
-        { label: "Update Medications", formType: "update_medications" },
-      ],
     }[role] || [];
 
   return (

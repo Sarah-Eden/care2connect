@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -81,7 +81,7 @@ export default function CaseList({ onSelect, refresh }) {
         />
         <List>
           {filteredCases.map((c) => (
-            <>
+            <React.Fragment key={c.id}>
               <ListItem disablePadding key={c.id}>
                 <ListItemButton
                   selected={selectedId === c.id}
@@ -100,7 +100,7 @@ export default function CaseList({ onSelect, refresh }) {
                 </ListItemButton>
               </ListItem>
               <Divider />
-            </>
+            </React.Fragment>
           ))}
         </List>
       </Box>

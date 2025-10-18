@@ -21,6 +21,8 @@ import NewCaseForm from "./NewCaseForm";
 import NewPlacementForm from "./NewPlacementForm";
 import NewChildForm from "./NewChildForm";
 import NewFosterFamilyForm from "./NewFosterFamily";
+import UpdateMedicalForm from "./UpdateMedicalForm";
+import UpdateHealthServiceForm from "./UpdateHealthServiceForm";
 import {
   getFosterPlacements,
   getFosterFamily,
@@ -38,6 +40,8 @@ export default function DetailView({
   const [fosterFamilyDetails, setFosterFamilyDetails] = useState(null);
   const [caseworkerDetails, setCaseworkerDetails] = useState(null);
   const [healthServices, setHealthServices] = useState([]);
+  const [editSection, setEditSection] = useState(null);
+  const [editingServiceId, setEditingServiceId] = useState(null);
   const [error, setError] = useState(null);
 
   // Fetch additional data when a case is selected
@@ -171,7 +175,7 @@ export default function DetailView({
                 </Typography>
                 <Chip
                   label={selectedCase.status}
-                  color={selectedCase.status === "open" ? "sucess" : "default"}
+                  color={selectedCase.status === "open" ? "success" : "default"}
                   size="small"
                   sx={{ textTransform: "capitalize" }}
                 />
@@ -248,36 +252,64 @@ export default function DetailView({
         {/* Medical Information Card */}
         <Card elevation={2} sx={{ mb: 2 }}>
           <CardContent>
-            <Typography variant="h6" color="secondary" gutterBottom>
-              Medical Information
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item size={{ xs: 12 }}>
-                <Typography
-                  variant="subtitle2"
-                  color="text.secondary"
-                  gutterBottom
-                >
-                  Allergies
-                </Typography>
-                <Typography variant="body1">
-                  {child.allergies || "None listed"}
-                </Typography>
-              </Grid>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 2,
+              }}
+            >
+              <Typography variant="h6" color="secondary" gutterBottom>
+                Medical Information
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => setEditSection("medical")}
+                color="primary"
+              >
+                <EditIcon />
+              </IconButton>
+            </Box>
 
-              <Grid item size={{ xs: 12 }}>
-                <Typography
-                  variant="subtitle2"
-                  color="text.secondary"
-                  gutterBottom
-                >
-                  Medications
-                </Typography>
-                <Typography variant="body1">
-                  {child.medications || "None listed"}
-                </Typography>
+            {editSection === "medical" ? (
+              <UpdateMedicalForm
+                child={child}
+                onClose={() => setEditSection(null)}
+                onSuccess={() => {
+                  setEditSection(null);
+                  if (onCaseCreated) onCaseCreated();
+                }}
+              />
+            ) : (
+              <Grid container spacing={2}>
+                <Grid item size={{ xs: 12 }}>
+                  <Typography
+                    variant="subtitle2"
+                    color="text.secondary"
+                    gutterBottom
+                  >
+                    Allergies
+                  </Typography>
+                  <Typography variant="body1">
+                    {child.allergies || "None listed"}
+                  </Typography>
+                </Grid>
+
+                <Grid item size={{ xs: 12 }}>
+                  <Typography
+                    variant="subtitle2"
+                    color="text.secondary"
+                    gutterBottom
+                  >
+                    Medications
+                  </Typography>
+                  <Typography variant="body1">
+                    {child.medications || "None listed"}
+                  </Typography>
+                </Grid>
               </Grid>
-            </Grid>
+            )}
           </CardContent>
         </Card>
 
@@ -300,6 +332,9 @@ export default function DetailView({
                       </TableCell>
                       <TableCell>
                         <strong>Status</strong>
+                      </TableCell>
+                      <TableCell>
+                        <strong>Actions</strong>
                       </TableCell>
                     </TableRow>
                   </TableHead>
@@ -324,6 +359,15 @@ export default function DetailView({
                             sx={{ textTransform: "capitalize" }}
                           />
                         </TableCell>
+                        <TableCell>
+                          <IconButton
+                            size="small"
+                            onClick={() => setEditingServiceId(service.id)}
+                            color="primary"
+                          >
+                            <EditIcon />
+                          </IconButton>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -333,6 +377,19 @@ export default function DetailView({
               <Typography variant="body2" color="text.secondary">
                 No upcoming health services scheduled.
               </Typography>
+            )}
+            {editingServiceId && (
+              <Box sx={{ m5: 2 }}>
+                <UpdateHealthServiceForm
+                  healthService={healthServices.find(
+                    (s) => s.id === editingServiceId
+                  )}
+                  onClose={() => setEditingServiceId(null)}
+                  onSuccess={() => {
+                    setEditingServiceId(null);
+                  }}
+                />
+              </Box>
             )}
           </CardContent>
         </Card>

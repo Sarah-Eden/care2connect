@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -118,31 +118,31 @@ export default function Notifications() {
           </Typography>
           <List>
             {upcomingServces.map((service) => (
-              <>
+              <React.Fragment key={service.id}>
                 <ListItem disablePadding key={service.id}>
                   <ListItemText
                     primary={`${service.child.last_name}, ${service.child.first_name}`}
                     secondary={
-                      <Box sx={{ display: "flex", gap: 1, mt: 0.5 }}>
+                      <span sx={{ display: "flex", gap: 1, mt: 0.5 }}>
                         <Typography variant="caption">
                           {formatServiceType(service.service)}
                         </Typography>
                         <Typography variant="caption">
                           {formatDate(service.due_date)}
                         </Typography>
-                      </Box>
+                      </span>
                     }
                   />
                 </ListItem>
                 <Divider />
-              </>
+              </React.Fragment>
             ))}
           </List>
         </>
       )}
 
       {/* No notifications */}
-      {overdueServices.length === 0 && setUpcomingServices.length === 0 && (
+      {overdueServices.length === 0 && upcomingServces.length === 0 && (
         <Typography
           variant="body2"
           color="text.secondary"

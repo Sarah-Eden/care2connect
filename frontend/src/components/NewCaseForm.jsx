@@ -117,7 +117,7 @@ export default function NewCaseForm({ onClose, onSuccess }) {
                         type="date"
                         fullWidth
                         required
-                        InputLabelProps={{ shrink: true }}
+                        slotProps={{ inputLabel: { shrink: true } }}
                         error={!!errors.startDate}
                         helperText={errors.startDate?.message}
                       />
