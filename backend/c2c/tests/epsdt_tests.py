@@ -59,13 +59,7 @@ class EPSDTTestCase(TestCase):
 		)
 	
 	def test_initial_health_service_creation(self):
-		case = Case.objects.create_case(
-			child=self.child,
-			caseworker = self.caseworker_user,
-			placement= self.placement,
-			status='open', 
-			start_date=timezone.now().date()
-		)
+		case = self.case
 
 		# Verify HealthService records are created
 		health_services = HealthService.objects.filter(child=case.child)
