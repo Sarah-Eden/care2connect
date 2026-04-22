@@ -41,10 +41,10 @@ class EPSDTTestCase(TestCase):
             child=self.child, caseworker=self.caseworker_user, placement=self.placement,
             status='open', start_date=timezone.now().date()
         )
-		# Create immunization records for HepB dose at birth
+		
 		self.immunization1 = ImmunizationRecord.objects.create(
 			child=self.child,
-			vaccine_name = 'HepB,',
+			vaccine_name = 'HepB',
 			dose_number = 1,
 			total_doses = 3,
 			date_administered = self.child.dob	
@@ -72,6 +72,9 @@ class EPSDTTestCase(TestCase):
 		self.assertIsNotNone(wc_service, 'Well-child service not created')
 		self.assertEqual(wc_service.status, 'pending')
 		self.assertIn('well_child', wc_service.service)
+		self.assertTrue(len(wc_service.immunizations) > 0, 'No immunizations on 2-month visit')
+		self.assertIn('DTaP', wc_service.immunizations)
+		self.assertIn('IPV', wc_service.immunizations)
 
 		# Check for dental, should fail as child < 12 months old
 		dental_service = health_services.filter(service__contains='dental').first()
@@ -109,11 +112,11 @@ class EPSDTTestCase(TestCase):
 
 
 	def tearDown(self):  
-		User.objects.all().delete()
-		Child.objects.all().delete()
-		FosterFamily.objects.all().delete()
-		FosterPlacement.objects.all().delete()
-		Case.objects.all().delete()
-		HealthService.objects.all().delete()
 		ImmunizationRecord.objects.all().delete()
+		HealthService.objects.all().delete()
+		Case.objects.all().delete()
+		FosterPlacement.objects.all().delete()
+		FosterFamily.objects.all().delete()
+		Child.objects.all().delete()
+		User.objects.all().delete()		
 		Group.objects.all().delete() 

@@ -14,7 +14,7 @@ import {
 } from "../api";
 
 export default function Notifications() {
-  const [upcomingServces, setUpcomingServices] = useState([]);
+  const [upcomingServices, setUpcomingServices] = useState([]);
   const [overdueServices, setOverdueServices] = useState([]);
   const [error, setError] = useState(null);
 
@@ -27,12 +27,6 @@ export default function Notifications() {
           getUpcomingHealthServiceRecords(),
           getOverdueHealthServiceRecords(),
         ]);
-
-        console.log("=== NOTIFICATIONS DEBUG ===");
-        console.log("Upcoming Services:", upcoming);
-        console.log("Overdue services:", overdue);
-        console.log("Upcoming count:", upcoming.length);
-        console.log("Overdue count:", overdue.length);
 
         setUpcomingServices(upcoming);
         setOverdueServices(overdue);
@@ -107,7 +101,7 @@ export default function Notifications() {
       )}
 
       {/* Upcoming Services */}
-      {upcomingServces.length > 0 && (
+      {upcomingServices.length > 0 && (
         <>
           <Typography
             variant="subtitle1"
@@ -117,7 +111,7 @@ export default function Notifications() {
             Upcoming Services
           </Typography>
           <List>
-            {upcomingServces.map((service) => (
+            {upcomingServices.map((service) => (
               <React.Fragment key={service.id}>
                 <ListItem disablePadding key={service.id}>
                   <ListItemText
@@ -142,7 +136,7 @@ export default function Notifications() {
       )}
 
       {/* No notifications */}
-      {overdueServices.length === 0 && upcomingServces.length === 0 && (
+      {overdueServices.length === 0 && upcomingServices.length === 0 && (
         <Typography
           variant="body2"
           color="text.secondary"

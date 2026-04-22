@@ -5,7 +5,7 @@ import { REFRESH_TOKEN, ACCESS_TOKEN, GROUPS } from "../constants";
 import { useState, useEffect } from "react";
 
 export default function ProtectedRoute({ children }) {
-  const [IsAuthorized, setIsAuthorized] = useState(null);
+  const [isAuthorized, setIsAuthorized] = useState(null);
 
   // Function to refresh token if expired
   const refreshToken = async () => {
@@ -61,12 +61,12 @@ export default function ProtectedRoute({ children }) {
     auth().catch(() => setIsAuthorized(false));
   }, []);
 
-  if (IsAuthorized == null) {
+  if (isAuthorized === null) {
     return <div>Loading...</div>;
   }
 
   // Retrieve groups dynamically form localStorage
   const groups = JSON.parse(localStorage.getItem(GROUPS) || "[]");
 
-  return IsAuthorized ? children : <Navigate to="/login" />;
+  return isAuthorized ? children : <Navigate to="/login" />;
 }

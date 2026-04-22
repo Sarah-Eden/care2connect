@@ -60,14 +60,10 @@ class TasksTestCase(TestCase):
 		# Verify HealthService visits at 1 and 2 months exist 
 		initial = HealthService.objects.filter(child=self.child)
 		initial_count = HealthService.objects.filter(child=self.child).count()
-		print(f'DOB: {self.child.dob}, Current Date: {fixed_date.date()}, Age_months: {calculate_age_in_months(self.child.dob, fixed_date.date())}')
-		for item in initial:
-			print(item)
 		self.assertGreater(initial_count, 0, 'No HealthService records created from create_case.')
 
 		# Run task, expect 0 new results.
 		result = generate_upcoming_health_services()
-		print(f'Test 1 Result: {result}')
 		self.assertEqual(HealthService.objects.filter(child=self.child).count(), initial_count, 'New records created inappropriately')
 
 	# Test new record creation on a day that should add a HealthService record for the 4 month visit
@@ -82,10 +78,6 @@ class TasksTestCase(TestCase):
 
 		# Run task, expect 1 new results.
 		result = generate_upcoming_health_services()
-		print(f'Test 2 Result: {result}')
-		record = HealthService.objects.filter(child=self.child)
-		for item in record:
-			print(item)
 		self.assertGreater(HealthService.objects.filter(child=self.child).count(), initial_count, 'HealthService record not created for 4m visit')
 	
 	# Test email reminder sending
@@ -104,18 +96,20 @@ class TasksTestCase(TestCase):
 		result = send_health_reminders()
 
 		# Assert email sent
-		# mock_send_mail.assert_called_once()
+		self.assertEqual(mock_send_mail.call_count, 3)
 		logs = ReminderLog.objects.filter(service=service)
 		self.assertTrue(logs.exists(), 'No sent logs created')
 		self.assertEqual(ReminderLog.objects.filter(service=service).count(), 3, "Unexpected number of logs generated")
 		
 	def tearDown(self):
-		User.objects.all().delete()
-		Group.objects.all().delete()
-		Child.objects.all().delete()
-		FosterFamily.objects.all().delete()
-		FosterPlacement.objects.all().delete()
-		Case.objects.all().delete()
-		HealthService.objects.all().delete()
-		ImmunizationRecord.objects.all().delete()
 		ReminderLog.objects.all().delete()
+		ImmunizationRecord.objects.all().delete()
+		HealthService.objects.all().delete()
+		Case.objects.all().delete()
+		FosterPlacement.objects.all().delete()
+		FosterFamily.objects.all().delete()
+		Child.objects.all().delete()
+		User.objects.all().delete()		
+		Group.objects.all().delete()
+
+

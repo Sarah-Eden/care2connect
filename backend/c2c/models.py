@@ -1,7 +1,7 @@
 from django.db import models, transaction
 from django.db.models import Q, UniqueConstraint
 from django.contrib.auth.models import User
-from django.forms import ValidationError
+from django.core.exceptions import ValidationError
 from multiselectfield import MultiSelectField
 from .constants import SERVICE_CHOICES, IMMUNIZATION_CHOICES, IMMUNIZATION_DOSES, EPSDT_REQUIREMENTS
 from django.utils import timezone
@@ -24,8 +24,8 @@ class Child(models.Model):
 
 class FosterFamily(models.Model):
 	family_name = models.CharField(max_length=256)
-	parent1 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='parent1')
-	parent2 = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='parent2')
+	parent1 = models.ForeignKey(User, on_delete=models.PROTECT, null=True, related_name='parent1')
+	parent2 = models.ForeignKey(User, on_delete=models.PROTECT, null=True, related_name='parent2')
 	max_occupancy = models.IntegerField(default=1)
 	current_occupancy = models.IntegerField(default=0)
 
@@ -36,8 +36,8 @@ class FosterFamily(models.Model):
 		return self.family_name
 
 class FosterPlacement(models.Model):
-	child = models.ForeignKey(Child, on_delete=models.SET_NULL, null=True)
-	foster_family = models.ForeignKey(FosterFamily, on_delete=models.SET_NULL, null=True)
+	child = models.ForeignKey(Child, on_delete=models.PROTECT, null=True)
+	foster_family = models.ForeignKey(FosterFamily, on_delete=models.PROTECT, null=True)
 	start_date = models.DateField()
 	end_date = models.DateField(blank=True, null=True)
 	end_reason = models.TextField(null=True, blank=True)
@@ -52,7 +52,9 @@ class FosterPlacement(models.Model):
 		]
 
 	def __str__(self):
-		return f'Child Last Name: {self.child.last_name}, Foster Family: {self.foster_family.family_name}'
+		child_name = self.child.last_name if self.child else 'Unknown'
+		family_name = self.foster_family.family_name if self.foster_family else 'Unknown'
+		return f'Child Last Name: {child_name}, Foster Family: {family_name}'
 
 def calculate_age_in_months(date_of_birth, reference_date=None):
 	if reference_date is None:
@@ -82,8 +84,6 @@ class CaseManager(models.Manager):
 		case.save()
 
 		# Create HealthService records for the 3-months following the case start_date
-		child = child
-		start_date = start_date
 		end_date = start_date + timedelta(days=91)
 
 		current_age_months = calculate_age_in_months(child.dob, start_date)
@@ -106,7 +106,7 @@ class CaseManager(models.Manager):
 			age = data['age_months']
 
 			for vaccine, vaccine_data in EPSDT_REQUIREMENTS['immunization_schedule'].items():
-				for dose_info in vaccine_data:
+				for dose_info in vaccine_data.get('schedule', []):
 					if 'age_months' in dose_info and 'dose' in dose_info:
 						dose_ages = dose_info['age_months'] if isinstance(dose_info['age_months'], list) else [dose_info['age_months']]
 						if age in dose_ages:
@@ -140,12 +140,12 @@ class CaseManager(models.Manager):
 
 class Case(models.Model):
 	objects = CaseManager()
-	child = models.ForeignKey(Child, on_delete=models.CASCADE, related_name='cases')
-	caseworker = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-	placement = models.ForeignKey(FosterPlacement, on_delete=models.SET_NULL, null=True, blank=True)
+	child = models.ForeignKey(Child, on_delete=models.PROTECT, related_name='cases')
+	caseworker = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
+	placement = models.ForeignKey(FosterPlacement, on_delete=models.PROTECT, null=True, blank=True)
 	start_date = models.DateField()
 	end_date = models.DateField(null=True, blank=True)
-	status = models.CharField(choices=[('open', 'Open'), ('closed', 'Closed')])	
+	status = models.CharField(choices=[('open', 'Open'), ('closed', 'Closed')], default='open')	
 
 	class Meta:
 		constraints=[
@@ -159,10 +159,10 @@ class Case(models.Model):
 class HealthService(models.Model):	
 	child = models.ForeignKey(Child, on_delete=models.CASCADE)
 	service = MultiSelectField(choices=SERVICE_CHOICES, min_choices=1)
-	immunizations = MultiSelectField(choices=IMMUNIZATION_CHOICES, default=None, null=True)
+	immunizations = MultiSelectField(choices=IMMUNIZATION_CHOICES, blank=True, default='')
 	due_date = models.DateField()
 	completed_date = models.DateField(null=True, blank=True)
-	status = models.CharField(choices=[('pending', 'Pending'), ('complete', 'Complete')])
+	status = models.CharField(choices=[('pending', 'Pending'), ('complete', 'Complete')], default='pending')
 	created_date = models.DateTimeField(auto_now_add=True)
 	updated_date = models.DateTimeField(null=True, blank=True)
 
@@ -186,7 +186,7 @@ class HealthService(models.Model):
 				total = vaccine_data.get('total_doses', 0)
 			
 				if next_dose > total:
-					break
+					continue
 				
 				record, created = ImmunizationRecord.objects.get_or_create(
 					child = self.child,
@@ -195,9 +195,6 @@ class HealthService(models.Model):
 					total_doses = total,
 					date_administered = self.completed_date
 				)
-
-				if not created:
-					print(f'Existing record found for {vaccine} dose #{next_dose}. Skipping create')
 
 
 class ImmunizationRecord(models.Model):
@@ -223,10 +220,11 @@ class ImmunizationRecord(models.Model):
 	
 	def save(self, *args, **kwargs):
 		self.total_doses = IMMUNIZATION_DOSES.get(self.vaccine_name, 0)
+		self.full_clean()
 		super(ImmunizationRecord, self).save(*args, **kwargs)
 		
 class ReminderLog(models.Model):
-	user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-	service = models.ForeignKey(HealthService, on_delete=models.SET_NULL, null=True)
+	user = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
+	service = models.ForeignKey(HealthService, on_delete=models.PROTECT, null=True)
 	sent_date = models.DateTimeField()
-	status = models.CharField(choices=[('sent', 'Sent'), ('failed', 'Failed')])
+	status = models.CharField(choices=[('sent', 'Sent'), ('failed', 'Failed')], default='sent')

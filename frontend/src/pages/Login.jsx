@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import api from "../api";
-import { ACCESS_TOKEN, REFRESH_TOKEN, GROUPS } from "../constants";
+import { ACCESS_TOKEN, REFRESH_TOKEN, GROUPS, ROLES } from "../constants";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -24,8 +24,7 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await api.post("/api/token/", { username, password });
-      console.log("Login response", res.data);
+      const res = await api.post("/api/token/", { username, password }); 
 
       const userGroups = res.data.groups || [];
 
@@ -33,12 +32,10 @@ export default function Login() {
       localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
       localStorage.setItem(GROUPS, JSON.stringify(res.data.groups));
 
-      navigate("/dashboard");
-
       // Redirect to appropriate dashboard
       if (
         userGroups.some((group) =>
-          ["Supervisor", "Caseworker", "FosterParent"].includes(group)
+          ROLES.includes(group)
         )
       ) {
         navigate("/dashboard");

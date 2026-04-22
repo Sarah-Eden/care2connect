@@ -9,14 +9,12 @@ import {
   Paper,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import CaseList from "./CaseList";
 import Notifications from "./Notifications";
 import Navigation from "./Navigation";
 
 export default function DashboardLayout({
   role,
   navigation,
-  caseList,
   detailView,
 }) {
   const navigate = useNavigate();
@@ -53,7 +51,7 @@ export default function DashboardLayout({
               sx={{
                 width: "100%",
                 height: "100%",
-                backgroundColor: "#f7f7f7",
+                backgroundColor: "background.default",
               }}
             >
               {navigation}
@@ -74,7 +72,7 @@ export default function DashboardLayout({
               sx={{
                 width: "100%",
                 height: "100%",
-                backgroundColor: "#ffffff",
+                backgroundColor: "background.paper",
               }}
             >
               {detailView}
@@ -85,7 +83,7 @@ export default function DashboardLayout({
           <Grid item size={{ xs: 12, md: 2 }}>
             <Paper
               elevation={3}
-              sx={{ width: "100%", height: "100%", backgroundColor: "#f7f7f7" }}
+              sx={{ width: "100%", height: "100%", backgroundColor: "background.default" }}
             >
               <Notifications />
             </Paper>

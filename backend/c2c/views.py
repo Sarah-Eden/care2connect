@@ -4,8 +4,7 @@ from .models import User, Case, Child, FosterFamily, FosterPlacement, HealthServ
 from .serializers import UserSerializer, CaseSerializer, ChildSerializer, FosterFamilySerializer, FosterPlacementSerializer, HealthServiceSerializer, ReminderSerializer, ImmunizationRecordSerializer
 from .permissions import RoleBasedObjectPermissions
 from .mixins import RoleBasedQuerySetMixin
-
-# Create your views here.		
+	
 class UserViewSet(RoleBasedQuerySetMixin, viewsets.ModelViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer

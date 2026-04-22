@@ -14,7 +14,6 @@ import {
   Select,
   MenuItem,
   FormHelperText,
-  getFormLabelUtilityClasses,
 } from "@mui/material";
 import { getUsersByGroup, createFosterFamily } from "../api";
 
@@ -94,7 +93,7 @@ export default function NewFosterFamilyForm({ onClose, onSuccess }) {
     <Box sx={{ p: 2 }}>
       {success && (
         <Alert severity="success" sx={{ mb: 2 }}>
-          Foster family created successfullly
+          Foster family created successfully
         </Alert>
       )}
       {error && (

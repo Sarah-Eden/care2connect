@@ -39,7 +39,6 @@ export default function UpdateHealthServiceForm({
 
   const onSubmit = async (data) => {
     setError(null);
-    console.log("Form data:", data);
 
     try {
       const updateData = {
@@ -53,8 +52,6 @@ export default function UpdateHealthServiceForm({
         updated_date: new Date().toISOString().split("T")[0],
       };
 
-      console.log("Update data being sent:", updateData);
-
       await updateHealthServiceRecord(healthService.id, updateData);
       setSuccess(true);
       if (onSuccess) {
@@ -62,10 +59,6 @@ export default function UpdateHealthServiceForm({
       }
       setTimeout(() => onClose(), 1500);
     } catch (error) {
-      console.error("Full error response:", error.response);
-      console.error("Error data", error.response?.data);
-      console.error("Error status", error.response?.status);
-      console.error("Error updating health service record.", error);
       setError("Failed to update health service record.");
     }
   };

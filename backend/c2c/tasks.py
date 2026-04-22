@@ -40,7 +40,7 @@ def generate_upcoming_health_services():
 			age = data['age_months']
 
 			for vaccine, vaccine_data in EPSDT_REQUIREMENTS['immunization_schedule'].items():
-				for dose_info in vaccine_data:
+				for dose_info in vaccine_data.get('schedule', []):
 					if 'age_months' in dose_info and 'dose' in dose_info:
 						dose_ages = dose_info['age_months'] if isinstance(dose_info['age_months'], list) else [dose_info['age_months']]
 						if age in dose_ages:
@@ -65,13 +65,19 @@ def generate_upcoming_health_services():
 
 		# Add dental checup if child > 12 months of age
 		if current_age_months >= 12:
-			new_service = HealthService.objects.create(
+			dental_due = timezone.now().date() + timedelta(days=30)
+			if not HealthService.objects.filter(
 				child=child,
-				service=['dental'],
-				due_date = timezone.now().date() + timedelta(days=30),
-				status='pending'
-			)
-			new_dental_count +=1
+				service__contains='dental',
+				due_date=dental_due
+			).exists():
+				HealthService.objects.create(
+					child=child,
+					service=['dental'],
+					due_date = timezone.now().date() + timedelta(days=30),
+					status='pending'
+				)
+				new_dental_count +=1
 		
 	return f'Created {new_wc_count} new well_child and {new_dental_count} new dental HealthService records.'
 
@@ -96,22 +102,20 @@ def send_health_reminders():
 				continue
 
 			recipients = []
-			if case.caseworker.email:
+			if case.caseworker:
 				recipients.append(case.caseworker)
-			if case.placement.foster_family:
+			if case.placement and case.placement.foster_family:
 				family = case.placement.foster_family
-				if family.parent1.email:
+				if family.parent1:
 					recipients.append(family.parent1)
-				if family.parent2.email:
+				if family.parent2:
 					recipients.append(family.parent2)
 
-			for person in recipients:
-				print(f'Service: {service.id}, Recipient: {person.email}')
 			if not recipients:
 				continue
 
 			subject = f'Health Service Reminder'
-			message = f'Health Service Reminder for {case.child.first_name} {case.child.last_name}. The {', '.join(service.service)} is due in {interval} days on {service.due_date}.'
+			message = f'Health Service Reminder for {case.child.first_name} {case.child.last_name}. The {", ".join(service.service)} is due in {interval} days on {service.due_date}.'
 
 			try:
 				for person in recipients:
@@ -119,7 +123,7 @@ def send_health_reminders():
 					ReminderLog.objects.create(
 						user = person,
 						service = service,
-						sent_date = today,
+						sent_date = timezone.now(),
 						status = 'sent'
 					)
 					sent_count += 1
@@ -127,9 +131,9 @@ def send_health_reminders():
 				ReminderLog.objects.create(
 					user = person,
 					service = service,
-					sent_date = today,
+					sent_date = timezone.now(),
 					status = 'failed'
 				)
 				failed_count += 1
-				print(f'Email failed for service {service.id}: {str(e)}')
+				logger.error(f'Email failed for service {service.id}: {str(e)}')
 	return f'Sent {sent_count} reminders, {failed_count} failures'

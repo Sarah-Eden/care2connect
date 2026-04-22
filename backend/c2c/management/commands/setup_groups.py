@@ -18,7 +18,7 @@ class Command(BaseCommand):
 		placement_type = ContentType.objects.get_for_model(FosterPlacement)
 		health_type = ContentType.objects.get_for_model(HealthService)
 		reminder_type = ContentType.objects.get_for_model(ReminderLog)
-		immuniztion_type = ContentType.objects.get_for_model(ImmunizationRecord)
+		immunization_type = ContentType.objects.get_for_model(ImmunizationRecord)
 
 		# Supervisor permissions: Full CRUD on Child, Case, FosterFamily, FosterPlacement, HealthService, and view on ReminderLog
 		supervisor_permissions = [
@@ -48,10 +48,10 @@ class Command(BaseCommand):
 			Permission.objects.get(codename='delete_healthservice', content_type=health_type),
 			Permission.objects.get(codename='view_healthservice', content_type=health_type),
 			# ImmunizationRecord model permissions
-			Permission.objects.get(codename='add_immunizationrecord', content_type=immuniztion_type),
-			Permission.objects.get(codename='change_immunizationrecord', content_type=immuniztion_type),
-			Permission.objects.get(codename='delete_immunizationrecord', content_type=immuniztion_type),
-			Permission.objects.get(codename='view_immunizationrecord', content_type=immuniztion_type),
+			Permission.objects.get(codename='add_immunizationrecord', content_type=immunization_type),
+			Permission.objects.get(codename='change_immunizationrecord', content_type=immunization_type),
+			Permission.objects.get(codename='delete_immunizationrecord', content_type=immunization_type),
+			Permission.objects.get(codename='view_immunizationrecord', content_type=immunization_type),
 			# ReminderLog model permissions
 			Permission.objects.get(codename='view_reminderlog', content_type=reminder_type)
 		]
@@ -77,9 +77,9 @@ class Command(BaseCommand):
 			Permission.objects.get(codename='change_healthservice', content_type=health_type),
 			Permission.objects.get(codename='view_healthservice', content_type=health_type),
 			# ImmunizationRecord model permissions
-			Permission.objects.get(codename='add_immunizationrecord', content_type=immuniztion_type),
-			Permission.objects.get(codename='change_immunizationrecord', content_type=immuniztion_type),
-			Permission.objects.get(codename='view_immunizationrecord', content_type=immuniztion_type),
+			Permission.objects.get(codename='add_immunizationrecord', content_type=immunization_type),
+			Permission.objects.get(codename='change_immunizationrecord', content_type=immunization_type),
+			Permission.objects.get(codename='view_immunizationrecord', content_type=immunization_type),
 			# ReminderLog model permissions
 			Permission.objects.get(codename='view_reminderlog', content_type=reminder_type)
 		]
@@ -100,9 +100,9 @@ class Command(BaseCommand):
 			Permission.objects.get(codename='change_healthservice', content_type=health_type),
 			Permission.objects.get(codename='view_healthservice', content_type=health_type),
 			# ImmunizationRecord model permissions
-			Permission.objects.get(codename='add_immunizationrecord', content_type=immuniztion_type),
-			Permission.objects.get(codename='change_immunizationrecord', content_type=immuniztion_type),
-			Permission.objects.get(codename='view_immunizationrecord', content_type=immuniztion_type),
+			Permission.objects.get(codename='add_immunizationrecord', content_type=immunization_type),
+			Permission.objects.get(codename='change_immunizationrecord', content_type=immunization_type),
+			Permission.objects.get(codename='view_immunizationrecord', content_type=immunization_type),
 			# ReminderLog model permissions
 			Permission.objects.get(codename='view_reminderlog', content_type=reminder_type),		
 		]

@@ -3,7 +3,7 @@ from django_q.tasks import schedule
 from django_q.models import Schedule
 
 class Command(BaseCommand):
-	help = 'Set up Djanog-Q2 schedules for tasks'
+	help = 'Set up Django-Q2 schedules for tasks'
 
 	def handle(self, *args, **options):
 		# Monthly health service record creation (midnight on day 1)
@@ -22,5 +22,5 @@ class Command(BaseCommand):
 			cron = '0 0 * * *' # Every day at 12am
 		)
 
-		print(self.style.SUCCESS('Schedules setup successfully'))
+		self.stdout.write(self.style.SUCCESS('Schedules setup successfully'))
 		

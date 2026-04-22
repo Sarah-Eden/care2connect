@@ -11,14 +11,11 @@ api.interceptors.request.use(
     const token = localStorage.getItem(ACCESS_TOKEN);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log("Added token to request:", config.url);
-    } else {
       console.warn("No token found for request:", config.url);
     }
     return config;
   },
   (error) => {
-    console.error("Interceptor error:", error);
     return Promise.reject(error);
   }
 );
@@ -27,7 +24,6 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error("API Error: ", error.response?.data || error.message);
     return Promise.reject(error);
   }
 );
@@ -284,7 +280,7 @@ export const updateImmunizationRecord = async (id, immunizationData) => {
 // Reminder Logs
 export const getReminderLogs = async () => {
   try {
-    const res = await api.get("/api/reminders");
+    const res = await api.get("/api/reminders/");
     return res.data;
   } catch (error) {
     console.error("Error fetching reminder logs: ", error);
@@ -336,31 +332,6 @@ export const getUpcomingHealthServiceRecords = async () => {
     const thirtyDaysFromToday = new Date(
       today.getTime() + 30 * 24 * 60 * 60 * 1000
     );
-
-    // Debug
-    console.log("=== getUpcomingHealthServiceRecords Debug ===");
-    console.log("All services:", allServices);
-    console.log("Today:", today);
-    console.log("30 days from now", thirtyDaysFromToday);
-
-    const filtered = allServices.filter((service) => {
-      const dueDate = new Date(service.due_date);
-      const isPending = service.status === "pending";
-      const isWithin30Days = dueDate >= today && dueDate <= thirtyDaysFromToday;
-
-      console.log(`Service ${service.id}:`, {
-        due_date: service.due_date,
-        dueDate,
-        status: service.status,
-        isPending,
-        isWithin30Days,
-        willInclude: isPending && isWithin30Days,
-      });
-      return isPending && isWithin30Days;
-    });
-
-    console.log("Filtered upcoming services", filtered);
-    return filtered;
   } catch (error) {
     console.error("Error fetching upcoming health services:", error);
     throw error;

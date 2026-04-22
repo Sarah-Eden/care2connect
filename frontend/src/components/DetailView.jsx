@@ -139,7 +139,7 @@ export default function DetailView({
   }
 
   {
-    /* Show case details for Child selcted from list */
+    /* Show case details for Child selected from list */
   }
   if (selectedCase) {
     const child = selectedCase.child;

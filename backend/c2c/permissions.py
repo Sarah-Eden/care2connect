@@ -5,14 +5,14 @@ from .utils import get_accessible_case_ids, get_accessible_child_ids
 
 class ModelPermissionsWithView(DjangoModelPermissions):
 	# Map HTTP methods to Django permission type
-	permissions_map = {
+	perms_map = {
 		'GET': ['%(app_label)s.view_%(model_name)s'],
 		'OPTIONS': [],
 		'HEAD': [],
-		'POST': ['%(app_label)s.add_%(modelname)s'],
-		'PUT': ['%(app_label)s.change_%(modelname)s'],
-		'PATCH': ['%(app_label)s.change_%(modelname)s'],
-		'DELETE': ['%(app_label)s.delete_%(modelname)s'],
+		'POST': ['%(app_label)s.add_%(model_name)s'],
+		'PUT': ['%(app_label)s.change_%(model_name)s'],
+		'PATCH': ['%(app_label)s.change_%(model_name)s'],
+		'DELETE': ['%(app_label)s.delete_%(model_name)s'],
 	}
 
 class RoleBasedObjectPermissions(ModelPermissionsWithView):

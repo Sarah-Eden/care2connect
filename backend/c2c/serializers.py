@@ -12,11 +12,11 @@ class UserSerializer(serializers.ModelSerializer):
 		fields = ['id', 'username', 'password', 'email', 'first_name', 'last_name', 'groups', 'is_active']
 		extra_kwargs = {'password': {'write_only': True}}
 
-		def create(self, validated_data):
-			groups = validated_data.pop('groups')
-			user = User.objects.create_user(**validated_data)
-			user.groups.set(groups)
-			return user
+	def create(self, validated_data):
+		groups = validated_data.pop('groups')
+		user = User.objects.create_user(**validated_data)
+		user.groups.set(groups)
+		return user
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 	def validate(self, attrs):
@@ -84,11 +84,8 @@ class ImmunizationRecordSerializer(serializers.ModelSerializer):
 		model=ImmunizationRecord
 		fields='__all__'
 	
-	def create(self, validated_data):
-		validated_data['required_doses'] = IMMUNIZATION_DOSES.get(validated_data['vaccine_name'], 0)
-		return super().create(validated_data)
-	
 	def validate(self, data):
-		if data['dose_number'] > data['required_doses']:
+		total = IMMUNIZATION_DOSES.get(data.get('vaccine_name'), 0)
+		if data.get('dose_number', 0) > total:
 			raise serializers.ValidationError('Dose number cannot exceed required doses.')
-		
+		return data

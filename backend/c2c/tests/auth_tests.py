@@ -56,7 +56,6 @@ class RbacApiTestCase(TestCase):
         # Validate test data
         self.assertTrue(FosterPlacement.objects.filter(child=self.child, foster_family=self.family).exists())
         self.assertTrue(Case.objects.filter(child=self.child, caseworker=self.caseworker_user, placement=self.placement).exists())
-        print(f"Test Setup: Case ID: {self.case.id}, Child ID: {self.child.id}, Placement ID: {self.placement.id}")
 
     def _login_user(self, username, password):
         data = {'username': username, 'password': password}
@@ -81,7 +80,6 @@ class RbacApiTestCase(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.caseworker_token}')
         # Test listing assigned cases
         response = self.client.get('/api/cases/')
-        print(f"Caseworker GET /api/cases/ Response: {response.status_code}, Data: {response.data}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)  # Should see only their assigned case
         self.assertEqual(response.data[0]['id'], self.case.id)
@@ -89,13 +87,11 @@ class RbacApiTestCase(TestCase):
         # Test updating the case
         update_data = {'status': 'open', 'child': self.case.child.id, 'caseworker': self.caseworker_user.id}
         response = self.client.patch(f'/api/cases/{self.case.id}/', update_data, format='json')
-        print(f"Caseworker Patch /api/cases/{self.case.id}/ Response: {response.status_code}, Data: {response.data}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['status'], 'open')
 
         # Test listing children (should see only the case's child)
         response = self.client.get('/api/children/')
-        print(f"Caseworker GET /api/children/ Response: {response.status_code}, Data: {response.data}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['id'], self.child.id)
@@ -104,7 +100,6 @@ class RbacApiTestCase(TestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.fosterparent1_token}')
         # Test listing children in their care
         response = self.client.get('/api/children/')
-        print(f"FosterParent GET /api/children/ Response: {response.status_code}, Data: {response.data}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)  # Should see only their placed child
         self.assertEqual(response.data[0]['id'], self.child.id)
@@ -117,28 +112,26 @@ class RbacApiTestCase(TestCase):
             'medications': 'Updated meds'
         }
         response = self.client.patch(f'/api/children/{self.child.id}/', update_data, format='json')
-        print(f"FosterParent Patch /api/children/{self.child.id}/ Response: {response.status_code}, Data: {response.data}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['medications'], 'Updated meds')
 
         # Test read-only access to case 
         response = self.client.get(f'/api/cases/{self.case.id}/')
-        print(f"FosterParent GET /api/cases/{self.case.id}/ Response: {response.status_code}, Data: {response.data}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)  # Changed to expect 403
 
         # Test update denied on case (should fail for PUT)
         update_data = {'status': 'closed', 'child': self.case.child.id, 'caseworker': self.caseworker_user.id}
         response = self.client.put(f'/api/cases/{self.case.id}/', update_data, format='json')
-        print(f"FosterParent PUT /api/cases/{self.case.id}/ Response: {response.status_code}, Data: {response.data}")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def tearDown(self):
         self.client.credentials() 
-        User.objects.all().delete()
-        Child.objects.all().delete()
-        FosterFamily.objects.all().delete()
-        FosterPlacement.objects.all().delete()
-        Case.objects.all().delete()
         HealthService.objects.all().delete()
-        ReminderLog.objects.all().delete()
-        Group.objects.all().delete()  # Clean up groups too
+        Case.objects.all().delete()
+        FosterPlacement.objects.all().delete()
+        FosterFamily.objects.all().delete()
+        Child.objects.all().delete()
+        User.objects.all().delete()		
+        Group.objects.all().delete() 
+
+        
