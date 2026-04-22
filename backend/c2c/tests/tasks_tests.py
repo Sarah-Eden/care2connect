@@ -54,7 +54,7 @@ class TasksTestCase(TestCase):
 	@patch('c2c.tasks.timezone.now')
 	def test_generate_upcoming_health_services(self, mock_now):
 		# September 25 should not generate new records (will be 4m on 12/27)
-		fixed_date = datetime(2025, 9, 25)
+		fixed_date = timezone.make_aware(datetime(2025, 9, 25))
 		mock_now.return_value = fixed_date
 
 		# Verify HealthService visits at 1 and 2 months exist 
@@ -69,7 +69,7 @@ class TasksTestCase(TestCase):
 	# Test new record creation on a day that should add a HealthService record for the 4 month visit
 	@patch('c2c.tasks.timezone.now')
 	def test_generate_upcoming_health_services_on_oct1(self, mock_now):
-		fixed_date = datetime(2025, 10, 1)
+		fixed_date = timezone.make_aware(datetime(2025, 10, 1))
 		mock_now.return_value = fixed_date
 
 	# Verify HealthService visit at 1 and 2 months exist

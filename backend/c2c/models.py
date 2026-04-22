@@ -56,6 +56,7 @@ class FosterPlacement(models.Model):
 		family_name = self.foster_family.family_name if self.foster_family else 'Unknown'
 		return f'Child Last Name: {child_name}, Foster Family: {family_name}'
 
+
 def calculate_age_in_months(date_of_birth, reference_date=None):
 	if reference_date is None:
 		reference_date = timezone.now().date()
@@ -68,6 +69,80 @@ def calculate_age_in_months(date_of_birth, reference_date=None):
 	delta_age = relativedelta(reference_date, date_of_birth)
 
 	return delta_age.years * 12 + delta_age.months
+
+
+def generate_health_services(child, reference_date):
+	current_age_months = calculate_age_in_months(child.dob, reference_date)
+	age_in_3months = current_age_months + 3
+	due_date_offset = 10 if current_age_months < 30 else 30
+	wc_count = 0
+	dental_count = 0
+
+	services_by_date = {}
+	for age in EPSDT_REQUIREMENTS['well_child_schedule']['age_in_months']:
+		if current_age_months < age <= age_in_3months:
+			due_date = child.dob + relativedelta(months=age) + timedelta(days=due_date_offset)
+			services_by_date[due_date] = {
+				'age_months': age,
+				'services': ['well_child'],
+				'immunizations': []
+			}
+
+	for date, data in services_by_date.items():
+		age = data['age_months']
+		for vaccine, vaccine_data in EPSDT_REQUIREMENTS['immunization_schedule'].items():
+			for dose_info in vaccine_data.get('schedule', []):
+				if 'age_months' in dose_info and 'dose' in dose_info:
+					dose_ages = dose_info['age_months'] if isinstance(dose_info['age_months'], list) else [dose_info['age_months']]
+					if age in dose_ages:
+						if not ImmunizationRecord.objects.filter(
+							child=child,
+							vaccine_name=vaccine,
+							dose_number=int(dose_info['dose'][0]),
+						).exists():
+							data['immunizations'].append(vaccine)
+	
+	for date, data in services_by_date.items():
+		if not HealthService.objects.filter(child=child, service__contains='well_child', due_date=date).exists():
+			HealthService.objects.create(
+				child=child,
+				service=data['services'],
+				immunizations=data['immunizations'],
+				due_date=date,
+				status='pending'
+			)
+			wc_count +=1
+	
+	dental_due = None
+
+	if current_age_months >= 12:
+		last_dental = HealthService.objects.filter(
+			child=child, service__contains='dental'
+		).order_by('-due_date').first()
+
+		if not last_dental:
+			dental_due = reference_date + timedelta(days=30)
+		else:
+			next_dental = last_dental.due_date + timedelta(days=183)
+			if next_dental <= reference_date + timedelta(days=90):
+				dental_due = next_dental
+	
+	elif current_age_months < 12 <= age_in_3months:
+		dental_due = child.dob + relativedelta(months=12) + timedelta(days=due_date_offset)
+		
+	if dental_due:
+		if not HealthService.objects.filter(
+			child=child, service__contains='dental', due_date=dental_due
+		).exists():
+			HealthService.objects.create(
+				child=child,
+				service=['dental'],
+				due_date=dental_due,
+				status='pending'
+			)
+			dental_count +=1
+
+	return wc_count, dental_count
 
 class CaseManager(models.Manager):
 	@transaction.atomic
@@ -82,60 +157,7 @@ class CaseManager(models.Manager):
 			end_date=end_date
 		)
 		case.save()
-
-		# Create HealthService records for the 3-months following the case start_date
-		end_date = start_date + timedelta(days=91)
-
-		current_age_months = calculate_age_in_months(child.dob, start_date)
-		age_in_3months = current_age_months + 3
-		due_date_offset = 10 if current_age_months < 30 else 30
-
-		# Get well child visits in 3 month window
-		services_by_date = {}
-		for age in EPSDT_REQUIREMENTS['well_child_schedule']['age_in_months']:
-			if current_age_months < age <= age_in_3months:
-				due_date = child.dob + relativedelta(months=age) + timedelta(days=due_date_offset)
-				services_by_date[due_date] = {
-					'age_months': age,
-					'services': ['well_child'],
-					'immunizations': []
-				}
-
-		# Get Immunizaation requirements based on well child visits
-		for date, data in services_by_date.items():
-			age = data['age_months']
-
-			for vaccine, vaccine_data in EPSDT_REQUIREMENTS['immunization_schedule'].items():
-				for dose_info in vaccine_data.get('schedule', []):
-					if 'age_months' in dose_info and 'dose' in dose_info:
-						dose_ages = dose_info['age_months'] if isinstance(dose_info['age_months'], list) else [dose_info['age_months']]
-						if age in dose_ages:
-							if not ImmunizationRecord.objects.filter(
-								child=child,
-								vaccine_name=vaccine,
-								dose_number=int(dose_info['dose'][0]),
-							).exists():
-								data['immunizations'].append(vaccine)
-
-		# Create HealthService records for well child/immunization visits
-		for date, data in services_by_date.items():
-			new_service = HealthService.objects.create(
-				child = child,
-				service = data['services'],
-				immunizations = data['immunizations'],
-				due_date = date,
-				status='pending' 
-			)
-
-		# Add dental checkup if child > 12 months of age
-		if current_age_months >= 12:
-			new_service = HealthService.objects.create(
-				child=child,
-				service=['dental'],
-				due_date = timezone.now().date() + timedelta(days=30),
-				status='pending'
-			)
-		
+		generate_health_services(child, start_date)
 		return case
 
 class Case(models.Model):
