@@ -45,31 +45,66 @@ A full-stack web application that aims to improve compliance with recommended he
 ### Initial Setup
 
 1. Clone the repository.
-2. Setup the backend and install requirements.txt:
+```
+git clone https://github.com/Sarah-Eden/care2connect.git
+cd care2connect/backend
+2. Create and activate virtual environment:
 
 ```
-cd backend
-cp .env.example .env
 python -m venv venv
-./venv/Scripts/activate
+```
+Mac/Linux
+```
+source venv/bin/activate
+```
+Windows
+```
+.\venv\Scripts\activate
+``` 
+3. Install dependences
+```
 pip install -r requirements.txt
 ```
 
-3. Setup the database:
+4. Setup the database and owner:
 
 ```
-createdb care2connect
+psql -U postgres
+```
+
+```
+CREATE DATABASE care2connect;
+CREATE USER c2c_admin WITH PASSWORD 'your password here';
+GRANT ALL ON SCHEMA public TO c2c_admin;
+ALTER DATABASE care2connect OWNER TO c2c_admin;
+\q
+```
+5. Configure environment variables: create a .env file in the backend directory and fill in your information for SECRET_KEY and DATABASE_PASSWORD:
+```
+cp .env.example .env
+```
+
+6. Run migrations & setup commands
+```
 python manage.py migrate
 python manage.py setup_groups
 python manage.py setup_schedules
 python manage.py createsuperuser
 ```
 
-4. In a new terminal, set up the front end and install required packages:
+7. Open a new terminal and navigate to the frontend directory:
 
 ```
-cd ../frontend
+cd care2connect/frontend
+```
+
+8. Create a .env file in the frontend directory:
+```
 cp .env.example .env
+```
+
+9. Install dependencies:
+```
 npm install
 ```
 
