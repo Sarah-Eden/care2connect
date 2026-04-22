@@ -51,7 +51,7 @@ A full-stack web application that aims to improve compliance with recommended he
 cd backend
 cp .env.example .env
 python -m venv venv
-source venv/bin/activate
+./venv/Scripts/activate
 pip install -r requirements.txt
 ```
 
