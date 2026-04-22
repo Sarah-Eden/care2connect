@@ -53,6 +53,19 @@ class RbacApiTestCase(TestCase):
             child=self.child, service=['well_child'], due_date=timezone.now().date(), status='pending'
         )
 
+        self.caseworker2_user = User.objects.create_user(
+            username='caseworker2', password='testpass123', email='caseworker2@mail.com',
+            first_name='Bob', last_name='Brown', is_active=True
+        )
+        self.caseworker2_user.groups.add(self.caseworker_group)
+        self.caseworker2_token = self._login_user('caseworker2', 'testpass123')['access']
+
+        self.child2 = Child.objects.create(first_name='Boy', last_name='Blue', dob=timezone.now().date())
+        self.case2 = Case.objects.create_case(
+            child=self.child2, caseworker=self.caseworker2_user,
+            status='open', start_date=timezone.now().date()
+        )
+
         # Validate test data
         self.assertTrue(FosterPlacement.objects.filter(child=self.child, foster_family=self.family).exists())
         self.assertTrue(Case.objects.filter(child=self.child, caseworker=self.caseworker_user, placement=self.placement).exists())
@@ -93,7 +106,7 @@ class RbacApiTestCase(TestCase):
         # Test listing children (should see only the case's child)
         response = self.client.get('/api/children/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data), 2)
         self.assertEqual(response.data[0]['id'], self.child.id)
 
     def test_fosterparent_access(self):
@@ -123,6 +136,46 @@ class RbacApiTestCase(TestCase):
         update_data = {'status': 'closed', 'child': self.case.child.id, 'caseworker': self.caseworker_user.id}
         response = self.client.put(f'/api/cases/{self.case.id}/', update_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+    def test_caseworker_cannot_see_other_caseworkers_cases(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.caseworker_token}')
+        response = self.client.get('/api/cases/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        case_ids = [c['id'] for c in response.data]
+        self.assertNotIn(self.case2.id, case_ids)
+
+    def test_caseworker_cannot_create_child(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.caseworker_token}')
+        new_child = {'first_name': 'Unauthorized', 'last_name': 'Child', 'dob': '2023-01-01'}
+        response = self.client.post('/api/children/', new_child, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_fosterparent_cannot_create_case(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.fosterparent1_token}')
+        case_data = {
+            'child': self.child.id,
+            'caseworker': self.caseworker_user.id,
+            'status': 'open',
+            'start_date': timezone.now().date().isoformat()
+        }
+        response = self.client.post('/api/cases/', case_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_fosterparent_cannot_see_unplaced_children(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.fosterparent1_token}')
+        response = self.client.get('/api/children/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        child_ids = [c['id'] for c in response.data]
+        self.assertNotIn(self.child2.id, child_ids)
+
+    def test_unauthenticated_access_denied(self):
+        self.client.credentials()
+        endpoints = ['/api/cases/', '/api/children/', '/api/health-services/']
+        for endpoint in endpoints:
+            response = self.client.get(endpoint)
+            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED,
+                f'{endpoint} accessible without authentication')
 
     def tearDown(self):
         self.client.credentials() 
