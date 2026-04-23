@@ -27,7 +27,12 @@ class FosterFamily(models.Model):
 	parent1 = models.ForeignKey(User, on_delete=models.PROTECT, null=True, related_name='parent1')
 	parent2 = models.ForeignKey(User, on_delete=models.PROTECT, null=True, related_name='parent2')
 	max_occupancy = models.IntegerField(default=1)
-	current_occupancy = models.IntegerField(default=0)
+	
+	@property
+	def current_occupancy(self):
+		return FosterPlacement.objects.filter(
+			foster_family=self, end_date__isnull=True
+		).count()
 
 	class Meta:
 		verbose_name_plural = 'FosterFamilies'
@@ -186,7 +191,7 @@ class HealthService(models.Model):
 	completed_date = models.DateField(null=True, blank=True)
 	status = models.CharField(choices=[('pending', 'Pending'), ('complete', 'Complete')], default='pending')
 	created_date = models.DateTimeField(auto_now_add=True)
-	updated_date = models.DateTimeField(null=True, blank=True)
+	updated_date = models.DateTimeField(auto_now=True)
 
 	def __str__(self):
 		return f'{self.service} record for {self.child}, due on {self.due_date}'
@@ -241,7 +246,8 @@ class ImmunizationRecord(models.Model):
 				raise ValidationError(f'Dose number cannot exceed total number required')
 	
 	def save(self, *args, **kwargs):
-		self.total_doses = IMMUNIZATION_DOSES.get(self.vaccine_name, 0)
+		if not self.pk:
+			self.total_doses = IMMUNIZATION_DOSES.get(self.vaccine_name, 0)
 		self.full_clean()
 		super(ImmunizationRecord, self).save(*args, **kwargs)
 		

@@ -3,11 +3,11 @@ from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.models import User, Group
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from unittest.mock import patch, MagicMock
 from c2c.tasks import generate_upcoming_health_services, send_health_reminders
-from c2c.models import *
+from c2c.models import Case, Child, FosterFamily, FosterPlacement, HealthService, ImmunizationRecord, ReminderLog, calculate_age_in_months
 from c2c.constants import EPSDT_REQUIREMENTS
 
 class TasksTestCase(TestCase):

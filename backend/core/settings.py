@@ -24,6 +24,16 @@ REST_FRAMEWORK = {
 	"DEFAULT_PERMISSION_CLASSES": [
 		"rest_framework.permissions.IsAuthenticated",
     ],
+	"DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Care2Connect API',
+    'DESCRIPTION': 'Foster care case management API',
+    'VERSION': '1.0.0',
+    'SWAGGER_UI_SETTINGS': {
+        'persistAuthorization': True,
+    },
 }
 
 
@@ -42,6 +52,7 @@ INSTALLED_APPS = [
 	'multiselectfield',
 	'django_q',
 	'c2c',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [

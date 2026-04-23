@@ -11,7 +11,6 @@ api.interceptors.request.use(
     const token = localStorage.getItem(ACCESS_TOKEN);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.warn("No token found for request:", config.url);
     }
     return config;
   },
@@ -108,7 +107,7 @@ export const updateCase = async (id, caseData) => {
     const res = await api.patch(`/api/cases/${id}/`, caseData);
     return res.data;
   } catch (error) {
-    console.error("Error updating child: ", error);
+    console.error("Error updating case: ", error);
     throw error;
   }
 };
@@ -182,7 +181,7 @@ export const updateFosterPlacement = async (id, placementData) => {
     const res = await api.patch(`/api/foster-placements/${id}/`, placementData);
     return res.data;
   } catch (error) {
-    console.error("Error updating child: ", error);
+    console.error("Error updating foster placement: ", error);
     throw error;
   }
 };
@@ -302,7 +301,7 @@ export const getUsers = async () => {
 export const getUser = async (id) => {
   if (!id) throw new Error("User ID is required.");
   try {
-    const res = await api.get(`/api/users/${id}`);
+    const res = await api.get(`/api/users/${id}/`);
     return res.data;
   } catch (error) {
     console.error(`Error fetching user ${id}:`, error);

@@ -19,7 +19,7 @@ class UserViewSet(RoleBasedQuerySetMixin, viewsets.ModelViewSet):
 		return queryset
 
 class CaseViewSet(RoleBasedQuerySetMixin, viewsets.ModelViewSet):
-	queryset = Case.objects.all()
+	queryset = Case.objects.select_related('child', 'caseworker', 'placement')
 	serializer_class = CaseSerializer
 	model = Case
 	permission_classes = [IsAuthenticated, RoleBasedPermission]
@@ -43,7 +43,7 @@ class FosterPlacementViewSet(RoleBasedQuerySetMixin, viewsets.ModelViewSet):
 	permission_classes = [IsAuthenticated, RoleBasedPermission]
 
 class HealthServiceViewSet(RoleBasedQuerySetMixin, viewsets.ModelViewSet):
-	queryset = HealthService.objects.all()
+	queryset = HealthService.objects.select_related('child')
 	serializer_class = HealthServiceSerializer
 	model = HealthService
 	permission_classes = [IsAuthenticated, RoleBasedPermission]

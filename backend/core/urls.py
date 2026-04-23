@@ -19,6 +19,8 @@ from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.routers import DefaultRouter
 from c2c.views import UserViewSet, CaseViewSet, ChildViewSet, FosterFamilyViewSet, FosterPlacementViewSet, HealthServiceViewSet, ReminderLogViewSet, ImmunizationRecordViewset 
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
 router.register(r'cases', CaseViewSet, basename='case')
@@ -35,4 +37,6 @@ urlpatterns = [
 	path('api/token/', TokenObtainPairView.as_view(), name='get_token'),
 	path('api/token/refresh/', TokenRefreshView.as_view(), name='refresh'),
 	path('api-auth/', include('rest_framework.urls')),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui')
 ]

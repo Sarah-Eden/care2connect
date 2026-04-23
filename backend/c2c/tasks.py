@@ -58,9 +58,9 @@ def send_health_reminders():
 			subject = f'Health Service Reminder'
 			message = f'Health Service Reminder for {case.child.first_name} {case.child.last_name}. The {", ".join(service.service)} is due in {interval} days on {service.due_date}.'
 
-			try:
-				for person in recipients:
-					send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, person.email, fail_silently=False)
+			for person in recipients:
+				try:
+					send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [person.email], fail_silently=False)
 					ReminderLog.objects.create(
 						user = person,
 						service = service,
@@ -68,13 +68,13 @@ def send_health_reminders():
 						status = 'sent'
 					)
 					sent_count += 1
-			except Exception as e:
-				ReminderLog.objects.create(
-					user = person,
-					service = service,
-					sent_date = timezone.now(),
-					status = 'failed'
-				)
-				failed_count += 1
-				logger.error(f'Email failed for service {service.id}: {str(e)}')
+				except Exception as e:
+					ReminderLog.objects.create(
+						user = person,
+						service = service,
+						sent_date = timezone.now(),
+						status = 'failed'
+					)
+					failed_count += 1
+					logger.error(f'Email failed for service {service.id}: {str(e)}')
 	return f'Sent {sent_count} reminders, {failed_count} failures'

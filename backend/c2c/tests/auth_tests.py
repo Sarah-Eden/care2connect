@@ -129,7 +129,7 @@ class RbacApiTestCase(TestCase):
 
         # Test read-only access to case 
         response = self.client.get(f'/api/cases/{self.case.id}/')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)  # Changed to expect 403
+        self.assertEqual(response.status_code, status.HTTP_200_OK) 
 
         # Test update denied on case (should fail for PUT)
         update_data = {'status': 'closed', 'child': self.case.child.id, 'caseworker': self.caseworker_user.id}
