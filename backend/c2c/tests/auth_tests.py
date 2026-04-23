@@ -97,16 +97,15 @@ class RbacApiTestCase(TestCase):
         self.assertEqual(len(response.data), 1)  # Should see only their assigned case
         self.assertEqual(response.data[0]['id'], self.case.id)
 
-        # Test updating the case
+        # Test caseworker cannot update a case
         update_data = {'status': 'open', 'child': self.case.child.id, 'caseworker': self.caseworker_user.id}
         response = self.client.patch(f'/api/cases/{self.case.id}/', update_data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['status'], 'open')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
         # Test listing children (should see only the case's child)
         response = self.client.get('/api/children/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['id'], self.child.id)
 
     def test_fosterparent_access(self):
