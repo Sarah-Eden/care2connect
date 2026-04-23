@@ -332,6 +332,11 @@ export const getUpcomingHealthServiceRecords = async () => {
     const thirtyDaysFromToday = new Date(
       today.getTime() + 30 * 24 * 60 * 60 * 1000
     );
+
+    return allServices.filter((service) => {
+      const dueDate = new Date(service.due_date);
+      return service.status === "pending" && dueDate >= today && dueDate <= thirtyDaysFromToday;
+    })
   } catch (error) {
     console.error("Error fetching upcoming health services:", error);
     throw error;

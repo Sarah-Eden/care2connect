@@ -15,6 +15,7 @@ import Navigation from "./Navigation";
 export default function DashboardLayout({
   role,
   navigation,
+  caseList,
   detailView,
 }) {
   const navigate = useNavigate();
@@ -51,7 +52,7 @@ export default function DashboardLayout({
               sx={{
                 width: "100%",
                 height: "100%",
-                backgroundColor: "background.default",
+                backgroundColor: "#f7f7f7",
               }}
             >
               {navigation}
@@ -83,7 +84,7 @@ export default function DashboardLayout({
           <Grid item size={{ xs: 12, md: 2 }}>
             <Paper
               elevation={3}
-              sx={{ width: "100%", height: "100%", backgroundColor: "background.default" }}
+              sx={{ width: "100%", height: "100%", backgroundColor: "#f7f7f7" }}
             >
               <Notifications />
             </Paper>
