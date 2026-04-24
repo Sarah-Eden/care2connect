@@ -21,10 +21,10 @@ Each role only sees data relevant to their responsibilities. Caseworkers can't a
 ## Screenshots
 
 ### Caseworker Dashboard
-![Caseworker Dashboard](CaseworkerDashboard.jpg)
+![Caseworker Dashboard](docs/images/CaseworkerDashboard.jpg)
 
 ### Foster Parent Dashboard
-![Foster Parent Dashboard](FosterParentDashboard.jpg)
+![Foster Parent Dashboard](docs/images/FosterParentDashboard.jpg)
 
 ## Tech Stack
 
