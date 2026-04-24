@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import {
+  Alert,
   Box,
   Typography,
   Grid,
@@ -46,9 +47,10 @@ export default function DetailView({
   const [editingServiceId, setEditingServiceId] = useState(null);
   const [error, setError] = useState(null);
 
-  // Fetch additional data when a case is selected
+
   useEffect(() => {
     const fetchAdditionalData = async () => {
+      setError(null);
       if (!selectedCase) {
         setFosterPlacementDetails(null);
         setFosterFamilyDetails(null);
@@ -60,26 +62,22 @@ export default function DetailView({
       try {
         const childId = selectedCase.child.id;
 
-        // Fetch caseworker details
         if (selectedCase.caseworker) {
           const caseworker = await getUser(selectedCase.caseworker);
           setCaseworkerDetails(caseworker);
         }
 
-        // Fetch placement
         const allPlacements = await getFosterPlacements();
         const childPlacement = allPlacements.find(
           (p) => p.child === childId && !p.end_date
         );
         setFosterPlacementDetails(childPlacement || null);
 
-        // Fetch foster family if placement exists
         if (childPlacement?.foster_family) {
           const family = await getFosterFamily(childPlacement.foster_family);
           setFosterFamilyDetails(family);
         }
 
-        // Fetch upcoming health service records
         const allHealthServices = await getHealthServiceRecords();
         const childHealthServices = allHealthServices
           .filter((hs) => {
@@ -92,7 +90,6 @@ export default function DetailView({
           .sort((a, b) => new Date(a.due_date) - new Date(b.due_date));
         setHealthServices(childHealthServices);
       } catch (error) {
-        console.error("Error fetching additional data:", error);
         setError("Error fetching child records.");
       }
     };
@@ -102,7 +99,6 @@ export default function DetailView({
   if (activeForm) {
     return (
       <Box sx={{ p: 2 }}>
-        {/*Form header with close button */}
         <Box
           sx={{
             display: "flex",
@@ -123,7 +119,6 @@ export default function DetailView({
           </IconButton>
         </Box>
 
-        {/*Render appropriate form */}
         {activeForm === "add_case" && (
           <NewCaseForm onClose={onCloseForm} onSuccess={onCaseCreated} />
         )}
@@ -138,9 +133,6 @@ export default function DetailView({
     );
   }
 
-  {
-    /* Show case details for Child selected from list */
-  }
   if (selectedCase) {
     const child = selectedCase.child;
 
@@ -400,10 +392,14 @@ export default function DetailView({
     );
   }
 
-  {
-    /* Nothing selected (Default) */
-  }
   return (
+    <Box sx={{ p: 2 }}>    
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+
     <Box
       sx={{
         p: 4,
@@ -416,6 +412,7 @@ export default function DetailView({
       <Typography variant="h6" color="text.secondary" textAlign={"center"}>
         Select a case from the list or choose an action from the menu.
       </Typography>
+    </Box>
     </Box>
   );
 }

@@ -8,7 +8,7 @@ from .models import Case, HealthService, ReminderLog, generate_health_services
 import logging
 
 logger = logging.getLogger(__name__)
-# Monthly task: Generate new HealthService records due in the next 60-90 day for all active cases.
+
 def generate_upcoming_health_services():
 	today = timezone.now().date()
 	active_cases = Case.objects.filter(status='open')
@@ -22,7 +22,6 @@ def generate_upcoming_health_services():
 		
 	return f'Created {total_wc} new well_child and {total_dental} new dental HealthService records.'
 
-# Daily task: Send email reminders for HealthService records due in 30, 14, and 7 days. Logs sends/failures
 def send_health_reminders():
 	today = timezone.now().date()
 	intervals = [30, 14, 7]
@@ -38,7 +37,6 @@ def send_health_reminders():
 	
 		for service in services:
 			case = service.child.cases.filter(status='open').first()
-			logger.debug(f'Service: {service.due_date}, Case: {case}, Status: {case.status if case else None}')
 			if not case:
 				continue
 

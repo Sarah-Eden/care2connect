@@ -216,7 +216,6 @@ export default function NewChildForm({ onClose, onSuccess }) {
           </CardContent>
         </Card>
 
-        {/* Form Buttons */}
         <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
           <Button
             variant="outlined"

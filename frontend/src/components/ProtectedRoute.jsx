@@ -1,13 +1,12 @@
 import { Navigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import api from "../api";
-import { REFRESH_TOKEN, ACCESS_TOKEN, GROUPS } from "../constants";
+import { REFRESH_TOKEN, ACCESS_TOKEN } from "../constants";
 import { useState, useEffect } from "react";
 
 export default function ProtectedRoute({ children }) {
   const [isAuthorized, setIsAuthorized] = useState(null);
 
-  // Function to refresh token if expired
   const refreshToken = async () => {
     const refreshToken = localStorage.getItem(REFRESH_TOKEN);
 
@@ -32,7 +31,6 @@ export default function ProtectedRoute({ children }) {
     }
   };
 
-  // Authorization checck: Validate token expiration and refresh if needed
   const auth = async () => {
     const token = localStorage.getItem(ACCESS_TOKEN);
 
@@ -64,9 +62,6 @@ export default function ProtectedRoute({ children }) {
   if (isAuthorized === null) {
     return <div>Loading...</div>;
   }
-
-  // Retrieve groups dynamically form localStorage
-  const groups = JSON.parse(localStorage.getItem(GROUPS) || "[]");
-
+  
   return isAuthorized ? children : <Navigate to="/login" />;
 }

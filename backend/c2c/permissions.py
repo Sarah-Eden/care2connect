@@ -37,9 +37,13 @@ class RoleBasedPermission(DjangoModelPermissions):
 				return True
 			return obj.parent1 == request.user or obj.parent2 == request.user
 		
-		if isinstance(obj, User) and role == 'FosterParent':
-			return Case.objects.filter(
-				child_id__in=child_ids, caseworker=obj, status='open'
-			).exists()
+		if isinstance(obj, User):
+			if role == 'Caseworker':
+				return True
+			if role == 'FosterParent':
+				return Case.objects.filter(
+					child_id__in=child_ids, caseworker=obj, status='open'
+				).exists()
+		
 		
 		return False

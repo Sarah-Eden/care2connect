@@ -1,10 +1,11 @@
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import Group, Permission
+from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
-from c2c.models import (Child, Case, FosterFamily, FosterPlacement, HealthService, ImmunizationRecord, ReminderLog)
-
+from c2c.models import Child, Case, FosterFamily, FosterPlacement, HealthService, ImmunizationRecord, ReminderLog
+ 
 ROLE_DEFINITIONS = {
     'Supervisor': [
+        (User, ['add', 'change', 'delete', 'view']),
         (Child, ['add', 'change', 'delete', 'view']),
         (Case, ['add', 'change', 'delete', 'view']),
         (FosterFamily, ['add', 'change', 'delete', 'view']),
@@ -15,6 +16,7 @@ ROLE_DEFINITIONS = {
 	],
     
     'Caseworker': [
+        (User, ['view']),
         (Child, ['change', 'view']),
         (Case, ['view']),
         (FosterFamily, ['view']),
@@ -25,6 +27,7 @@ ROLE_DEFINITIONS = {
 	],
     
 	'FosterParent': [
+        (User, ['view']),
         (Child, ['change', 'view']),
         (Case, ['view']),
         (FosterFamily, ['view']),

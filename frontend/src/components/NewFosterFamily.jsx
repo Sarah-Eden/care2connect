@@ -39,7 +39,7 @@ export default function NewFosterFamilyForm({ onClose, onSuccess }) {
 
   const parent1Id = watch("parent1Id");
 
-  // Load Foster Parents
+
   useEffect(() => {
     const fetchFosterParents = async () => {
       try {
@@ -56,7 +56,6 @@ export default function NewFosterFamilyForm({ onClose, onSuccess }) {
   const onSubmit = async (data) => {
     setError(null);
 
-    // Prevent same parent from being selected twice
     if (data.parent1Id === data.parent2Id) {
       setError("Parent 1 and Parent 2 cannot be the same person.");
       return;
@@ -133,7 +132,6 @@ export default function NewFosterFamilyForm({ onClose, onSuccess }) {
                 />
               </Grid>
 
-              {/*Parent 1 */}
               <Grid item size={{ xs: 12, sm: 6 }}>
                 <Controller
                   name="parent1Id"
@@ -168,7 +166,6 @@ export default function NewFosterFamilyForm({ onClose, onSuccess }) {
                 />
               </Grid>
 
-              {/* Parent 2 (Optional) */}
               <Grid item size={{ xs: 12, sm: 6 }}>
                 <Controller
                   name="parent2Id"
@@ -193,7 +190,6 @@ export default function NewFosterFamilyForm({ onClose, onSuccess }) {
                 />
               </Grid>
 
-              {/* Max Occupancy */}
               <Grid item size={{ xs: 12 }}>
                 <Controller
                   name="maxOccupancy"
@@ -218,7 +214,6 @@ export default function NewFosterFamilyForm({ onClose, onSuccess }) {
           </CardContent>
         </Card>
 
-        {/* Form Buttons */}
         <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
           <Button
             variant="outlined"

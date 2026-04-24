@@ -1,15 +1,13 @@
 from django.contrib import admin
 from .models import Case, Child, FosterFamily, FosterPlacement, HealthService, ReminderLog
 
-# Inline to display Case within Child
+
 class CaseInline(admin.TabularInline):
 	model=Case
 
-# Inline for HealthService within Child
 class HealthServiceInline(admin.TabularInline):
 	model=HealthService
 
-# Inline to display ReminderLog within HealthService
 class ReminderLogInline(admin.TabularInline):
 	model=ReminderLog
 

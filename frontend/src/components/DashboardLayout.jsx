@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Notifications from "./Notifications";
-import Navigation from "./Navigation";
 
 export default function DashboardLayout({
   role,
@@ -45,7 +44,6 @@ export default function DashboardLayout({
       </AppBar>
       <Box sx={{ flexGrow: 1 }}>
         <Grid container spacing={0.5} sx={{ height: "100%", p: 2 }}>
-          {/* Navigation panel (Grid Column 1) */}
           <Grid item size={{ xs: 12, md: 2 }}>
             <Paper
               elevation={5}
@@ -59,14 +57,12 @@ export default function DashboardLayout({
             </Paper>
           </Grid>
 
-          {/* Case List (Grid Column 2) */}
           <Grid item size={{ xs: 12, md: 3 }}>
             <Paper elevation={3} sx={{ width: "100%", height: "100%" }}>
               {caseList}
             </Paper>
           </Grid>
 
-          {/* Case Detail and Form display (Grid Column 3) */}
           <Grid item size={{ xs: 12, md: 5 }}>
             <Paper
               elevation={3}
@@ -80,7 +76,6 @@ export default function DashboardLayout({
             </Paper>
           </Grid>
 
-          {/* Notifications Panel (Grid Column 4) */}
           <Grid item size={{ xs: 12, md: 2 }}>
             <Paper
               elevation={3}

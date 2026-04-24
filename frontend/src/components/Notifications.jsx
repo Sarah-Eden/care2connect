@@ -31,14 +31,13 @@ export default function Notifications() {
         setUpcomingServices(upcoming);
         setOverdueServices(overdue);
       } catch (error) {
-        console.error("Error fetching notifications:", error);
         setError("Failed to load notifications");
       }
     };
     fetchNotifications();
   }, []);
 
-  // Function to format HealthsService type for Notification display
+  
   const formatServiceType = (serviceArray) => {
     if (!serviceArray || serviceArray.length === 0) return "Service";
 
@@ -71,15 +70,14 @@ export default function Notifications() {
         Notifications
       </Typography>
 
-      {/* Display error if database get fails */}
       {error !== null && <Alert severity="error">{error}</Alert>}
 
-      {/* Overdue services */}
       {overdueServices.length > 0 && (
         <>
           <Typography
             variant="subtitle1"
             color="error"
+            textAlign="center"
             sx={{ fontWeight: "bold", mt: 2, mb: 1 }}
           >
             Past Due
@@ -100,12 +98,12 @@ export default function Notifications() {
         </>
       )}
 
-      {/* Upcoming Services */}
       {upcomingServices.length > 0 && (
         <>
           <Typography
             variant="subtitle1"
             color="secondary.dark"
+            textAlign="center"
             sx={{ fontWeight: "bold", mt: 2, mb: 1 }}
           >
             Upcoming Services
@@ -119,10 +117,7 @@ export default function Notifications() {
                     secondary={
                       <span sx={{ display: "flex", gap: 1, mt: 0.5 }}>
                         <Typography variant="caption">
-                          {formatServiceType(service.service)}
-                        </Typography>
-                        <Typography variant="caption">
-                          {formatDate(service.due_date)}
+                          {formatServiceType(service.service)} - {formatDate(service.due_date)}
                         </Typography>
                       </span>
                     }
@@ -135,7 +130,6 @@ export default function Notifications() {
         </>
       )}
 
-      {/* No notifications */}
       {overdueServices.length === 0 && upcomingServices.length === 0 && (
         <Typography
           variant="body2"

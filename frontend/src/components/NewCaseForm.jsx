@@ -83,12 +83,17 @@ export default function NewCaseForm({ onClose, onSuccess }) {
     <Box sx={{ p: 2 }}>
       {success && (
         <Alert severity="success" sx={{ mb: 2 }}>
-          Case created successfully.
+          Case record created successfully.
+        </Alert>
+      )}
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
         </Alert>
       )}
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Child Search component */}
         <ChildSearch
           onSelectChild={setSelectedChild}
           searchFunction={getChildren}
@@ -96,7 +101,6 @@ export default function NewCaseForm({ onClose, onSuccess }) {
           onClearSelection={() => setSelectedChild(null)}
         />
 
-        {/* Case details form */}
         {selectedChild && (
           <Card elevation={2} sx={{ mb: 3 }}>
             <CardContent>
@@ -180,7 +184,6 @@ export default function NewCaseForm({ onClose, onSuccess }) {
           </Card>
         )}
 
-        {/* Form buttons */}
         {selectedChild && (
           <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
             <Button

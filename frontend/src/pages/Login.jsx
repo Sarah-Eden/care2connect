@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import api from "../api";
-import { ACCESS_TOKEN, REFRESH_TOKEN, GROUPS, ROLES } from "../constants";
+import { ACCESS_TOKEN, REFRESH_TOKEN, GROUPS } from "../constants";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -33,11 +33,7 @@ export default function Login() {
       localStorage.setItem(GROUPS, JSON.stringify(res.data.groups));
 
       // Redirect to appropriate dashboard
-      if (
-        userGroups.some((group) =>
-          ROLES.includes(group)
-        )
-      ) {
+      if (userGroups.length > 0) {
         navigate("/dashboard");
       } else {
         alert("No recognized role for account - redirecting to login.");

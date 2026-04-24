@@ -12,7 +12,6 @@ export default function Dashboard() {
   const [detailRefresh, setDetailRefresh] = useState(0);
   const [userRole, setUserRole] = useState(null);
 
-  // Get user role on page load
   useEffect(() => {
     const groups = JSON.parse(localStorage.getItem(GROUPS) || "[]");
     setUserRole(groups[0] || "Unknown");

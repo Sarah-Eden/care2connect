@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
+  Alert,
   Box,
   Typography,
   List,
@@ -12,7 +13,6 @@ import {
   InputLabel,
   ListItemButton,
   Divider,
-  Alert,
 } from "@mui/material";
 import { getCases } from "../api";
 
@@ -29,7 +29,6 @@ export default function CaseList({ onSelect, refresh }) {
         const data = await getCases();
         setCases(data);
       } catch (error) {
-        console.error("Error fetching cases:", error);
         setError("Failed to load cases.");
       }
     };
@@ -48,10 +47,15 @@ export default function CaseList({ onSelect, refresh }) {
   };
 
   return (
+    <Box sx={{ p: 2 }}>    
+              {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              )}
     <Box sx={{ p: { xs: 1, sm: 2, textAlign: "center" } }}>
       <Typography variant="h6">Assigned Cases</Typography>
 
-      {/* Mobile drop down */}
       <Box sx={{ display: { xs: "block", sm: "block", md: "none" } }}>
         <FormControl fullWidth>
           <InputLabel>Select Case</InputLabel>
@@ -70,7 +74,6 @@ export default function CaseList({ onSelect, refresh }) {
         </FormControl>
       </Box>
 
-      {/* Desktop list */}
       <Box sx={{ display: { xs: "none", sm: "none", md: "block" } }}>
         <TextField
           label="Filter"
@@ -105,6 +108,7 @@ export default function CaseList({ onSelect, refresh }) {
         </List>
       </Box>
       {filteredCases.length === 0 && <Typography>No cases found.</Typography>}
+    </Box>
     </Box>
   );
 }

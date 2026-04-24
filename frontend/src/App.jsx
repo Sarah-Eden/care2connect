@@ -3,22 +3,10 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
-import { GROUPS } from "./constants";
 
 function Logout() {
   localStorage.clear();
   return <Navigate to="/login" />;
-}
-
-function RoleDashboard() {
-  const groups = JSON.parse(localStorage.getItem(GROUPS) || "[]");
-  const role = groups[0];
-
-  if (!role) {
-    return <Navigate to="/login" />;
-  }
-
-  return <Dashboard role={role} />;
 }
 
 function App() {

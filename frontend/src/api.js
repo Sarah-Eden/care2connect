@@ -5,358 +5,189 @@ const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
 });
 
-// Interceptor to add token to every request if available
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem(ACCESS_TOKEN);
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
 
-// Response interceptor for error handling
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    return Promise.reject(error);
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem(ACCESS_TOKEN);
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-);
+  return config;
+});
 
-// Children
+
 export const getChildren = async () => {
-  try {
-    const res = await api.get("/api/children/");
-    return res.data;
-  } catch (error) {
-    console.error("Error fetching children: ", error);
-    throw error;
-  }
+  const res = await api.get("/api/children/");
+  return res.data;
 };
 
 export const getChild = async (id) => {
   if (!id) throw new Error("Child ID is required");
-  try {
-    const res = await api.get(`/api/children/${id}/`);
-    return res.data;
-  } catch (error) {
-    console.error(`Error fetching child ${id}: `, error);
-    throw error;
-  }
+  const res = await api.get(`/api/children/${id}/`);
+  return res.data;
 };
 
 export const createChild = async (childData) => {
-  try {
-    const res = await api.post("/api/children/", childData);
-    return res.data;
-  } catch (error) {
-    console.error("Error creating child: ", error);
-    throw error;
-  }
+  const res = await api.post("/api/children/", childData);
+  return res.data;
 };
 
 export const updateChild = async (id, childData) => {
-  try {
-    const res = await api.patch(`/api/children/${id}/`, childData);
-    return res.data;
-  } catch (error) {
-    console.error("Error updating child: ", error);
-    throw error;
-  }
+  const res = await api.patch(`/api/children/${id}/`, childData);
+  return res.data;
 };
 
-// CASES
+
 export const getCases = async () => {
-  try {
-    const res = await api.get("/api/cases/");
-    return res.data;
-  } catch (error) {
-    console.error("Error fetching cases: ", error);
-    throw error;
-  }
+  const res = await api.get("/api/cases/");
+  return res.data;
 };
 
 export const getCase = async (id) => {
   if (!id) throw new Error("Case ID is required");
-  try {
-    const res = await api.get(`/api/cases/${id}/`);
-    return res.data;
-  } catch (error) {
-    console.error(`Error fetching case ${id}: `, error);
-    throw error;
-  }
+  const res = await api.get(`/api/cases/${id}/`);
+  return res.data;
 };
 
 export const createCase = async (caseData) => {
-  try {
-    const res = await api.post("/api/cases/", caseData);
-
-    return res.data;
-  } catch (error) {
-    console.error("Error creating case: ", error);
-    throw error;
-  }
+  const res = await api.post("/api/cases/", caseData);
+  return res.data;
 };
 
 export const updateCase = async (id, caseData) => {
-  try {
-    const res = await api.patch(`/api/cases/${id}/`, caseData);
-    return res.data;
-  } catch (error) {
-    console.error("Error updating case: ", error);
-    throw error;
-  }
+  const res = await api.patch(`/api/cases/${id}/`, caseData);
+  return res.data;
 };
 
-// Foster Families
+
 export const getFosterFamilies = async () => {
-  try {
-    const res = await api.get("/api/foster-families/");
-    return res.data;
-  } catch (error) {
-    console.error("Error fetching foster families: ", error);
-    throw error;
-  }
+  const res = await api.get("/api/foster-families/");
+  return res.data;
 };
 
 export const getFosterFamily = async (id) => {
   if (!id) throw new Error("Family ID is required");
-  try {
-    const res = await api.get(`/api/foster-families/${id}/`);
-    return res.data;
-  } catch (error) {
-    console.error(`Error fetching foster families ${id}: `, error);
-    throw error;
-  }
+  const res = await api.get(`/api/foster-families/${id}/`);
+  return res.data;
 };
 
 export const createFosterFamily = async (familyData) => {
-  try {
-    const res = await api.post("/api/foster-families/", familyData);
-    return res.data;
-  } catch (error) {
-    console.error("Error creating foster familiy: ", error);
-    throw error;
-  }
+  const res = await api.post("/api/foster-families/", familyData);
+  return res.data;
 };
 
-// Foster Placements
+
 export const getFosterPlacements = async () => {
-  try {
-    const res = await api.get("/api/foster-placements/");
-    return res.data;
-  } catch (error) {
-    console.error("Error fetching foster placements: ", error);
-    throw error;
-  }
+  const res = await api.get("/api/foster-placements/");
+  return res.data;
 };
 
 export const getFosterPlacement = async (id) => {
   if (!id) throw new Error("Placement ID is required");
-  try {
-    const res = await api.get(`/api/foster-placements/${id}/`);
-    return res.data;
-  } catch (error) {
-    console.error(`Error fetching foster placement ${id}: `, error);
-    throw error;
-  }
+  const res = await api.get(`/api/foster-placements/${id}/`);
+  return res.data;
 };
 
 export const createFosterPlacement = async (placementData) => {
-  try {
-    const res = await api.post("/api/foster-placements/", placementData);
-    return res.data;
-  } catch (error) {
-    console.error("Error creating foster placement: ", error);
-    throw error;
-  }
+  const res = await api.post("/api/foster-placements/", placementData);
+  return res.data;
 };
 
 export const updateFosterPlacement = async (id, placementData) => {
-  try {
-    const res = await api.patch(`/api/foster-placements/${id}/`, placementData);
-    return res.data;
-  } catch (error) {
-    console.error("Error updating foster placement: ", error);
-    throw error;
-  }
+  const res = await api.patch(`/api/foster-placements/${id}/`, placementData);
+  return res.data;
 };
 
-// Health Service Records
+
 export const getHealthServiceRecords = async () => {
-  try {
-    const res = await api.get("/api/health-services/");
-    return res.data;
-  } catch (error) {
-    console.error("Error fetching health service records: ", error);
-    throw error;
-  }
+  const res = await api.get("/api/health-services/");
+  return res.data;
 };
 
 export const getHealthServiceRecord = async (id) => {
-  if (!id) throw new Error("Case ID is required");
-  try {
-    const res = await api.get(`/api/health-services/${id}/`);
-    return res.data;
-  } catch (error) {
-    console.error(`Error fetching health service record ${id}: `, error);
-    throw error;
-  }
+  if (!id) throw new Error("ID is required");
+  const res = await api.get(`/api/health-services/${id}/`);
+  return res.data;
 };
 
 export const createHealthServiceRecord = async (healthServiceData) => {
-  try {
-    const res = await api.post("/api/health-services/", healthServiceData);
-    return res.data;
-  } catch (error) {
-    console.error("Error creating health service record: ", error);
-    throw error;
-  }
+  const res = await api.post("/api/health-services/", healthServiceData);
+  return res.data;
 };
 
 export const updateHealthServiceRecord = async (id, healthServiceData) => {
-  try {
-    const res = await api.patch(
-      `/api/health-services/${id}/`,
-      healthServiceData
-    );
-    return res.data;
-  } catch (error) {
-    console.error("Error updating health service record: ", error);
-    throw error;
-  }
+  const res = await api.patch(`/api/health-services/${id}/`, healthServiceData);
+  return res.data;
 };
 
-// Immunization Records
-export const getImmunizationRecords = async () => {
-  try {
-    const res = await api.get("/api/immunization-records/");
-    return res.data;
-  } catch (error) {
-    console.error("Error fetching immunization records: ", error);
-    throw error;
-  }
-};
-
-export const getImmunizationRecord = async (id) => {
-  if (!id) throw new Error("Immunization Record ID is required");
-  try {
-    const res = await api.get(`/api/immunization-records/${id}/`);
-    return res.data;
-  } catch (error) {
-    console.error(`Error fetching immunization record ${id}: `, error);
-    throw error;
-  }
-};
-
-export const createImmunizationRecord = async (immunizationData) => {
-  try {
-    const res = await api.post("/api/immunization-records/", immunizationData);
-    return res.data;
-  } catch (error) {
-    console.error("Error creating immunization record: ", error);
-    throw error;
-  }
-};
-
-export const updateImmunizationRecord = async (id, immunizationData) => {
-  try {
-    const res = await api.patch(
-      `/api/immunization-records/${id}/`,
-      immunizationData
-    );
-    return res.data;
-  } catch (error) {
-    console.error("Error updating immunization record: ", error);
-    throw error;
-  }
-};
-
-// Reminder Logs
-export const getReminderLogs = async () => {
-  try {
-    const res = await api.get("/api/reminders/");
-    return res.data;
-  } catch (error) {
-    console.error("Error fetching reminder logs: ", error);
-    throw error;
-  }
-};
-
-// Users
 export const getUsers = async () => {
-  try {
-    const res = await api.get("/api/users/");
-    return res.data;
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    throw error;
-  }
+  const res = await api.get("/api/users/");
+  return res.data;
 };
 
 export const getUser = async (id) => {
   if (!id) throw new Error("User ID is required.");
-  try {
-    const res = await api.get(`/api/users/${id}/`);
-    return res.data;
-  } catch (error) {
-    console.error(`Error fetching user ${id}:`, error);
-    throw error;
-  }
+  const res = await api.get(`/api/users/${id}/`);
+  return res.data;
 };
 
-// Get users filtered by group
-// @param {string} groupName - 'Supervisor', 'Caseworker', or 'FosterParent'
 export const getUsersByGroup = async (groupName) => {
-  try {
-    const res = await api.get(`/api/users/?group=${groupName}`);
-    return res.data;
-  } catch (error) {
-    console.error(`Error fetching users in group ${groupName}:`, error);
-    throw error;
-  }
+  const res = await api.get(`/api/users/?group=${groupName}`);
+  return res.data;
 };
 
-// Helper functions
-// Get all health service records due in the next 30 days
+
 export const getUpcomingHealthServiceRecords = async () => {
-  try {
-    const allServices = await getHealthServiceRecords();
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const thirtyDaysFromToday = new Date(
-      today.getTime() + 30 * 24 * 60 * 60 * 1000
-    );
+  const allServices = await getHealthServiceRecords();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const thirtyDaysFromToday = new Date(
+    today.getTime() + 30 * 24 * 60 * 60 * 1000
+  );
 
-    return allServices.filter((service) => {
-      const dueDate = new Date(service.due_date);
-      return service.status === "pending" && dueDate >= today && dueDate <= thirtyDaysFromToday;
-    })
-  } catch (error) {
-    console.error("Error fetching upcoming health services:", error);
-    throw error;
-  }
+  return allServices.filter((service) => {
+    const dueDate = new Date(service.due_date);
+    return service.status === "pending" && dueDate >= today && dueDate <= thirtyDaysFromToday;
+  })
 };
 
-// Get overdue health services
 export const getOverdueHealthServiceRecords = async () => {
-  try {
-    const allServices = await getHealthServiceRecords();
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+  const allServices = await getHealthServiceRecords();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-    return allServices.filter((service) => {
-      const dueDate = new Date(service.due_date);
-      return service.status === "pending" && dueDate < today;
-    });
-  } catch (error) {
-    console.error("Error fetching overdue health service records: ", error);
-    throw error;
-  }
+  return allServices.filter((service) => {
+    const dueDate = new Date(service.due_date);
+    return service.status === "pending" && dueDate < today;
+  });
 };
+
+{/*
+export const getImmunizationRecords = async () => {
+  const res = await api.get("/api/immunization-records/");
+  return res.data;
+};
+
+export const getImmunizationRecord = async (id) => {
+  if (!id) throw new Error("Immunization Record ID is required");
+  const res = await api.get(`/api/immunization-records/${id}/`);
+  return res.data;
+};
+
+export const createImmunizationRecord = async (immunizationData) => {
+  const res = await api.post("/api/immunization-records/", immunizationData);
+  return res.data;
+};
+
+export const updateImmunizationRecord = async (id, immunizationData) => {
+  const res = await api.patch(`/api/immunization-records/${id}/`, immunizationData);
+  return res.data;
+};
+
+
+export const getReminderLogs = async () => {
+  const res = await api.get("/api/reminders/");
+  return res.data;
+};
+*/}
 
 export default api;

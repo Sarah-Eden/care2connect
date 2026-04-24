@@ -155,7 +155,6 @@ export default function UpdateHealthServiceForm({
           </Grid>
         </Grid>
 
-        {/* Form buttons */}
         <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
           <Button
             variant="outlined"

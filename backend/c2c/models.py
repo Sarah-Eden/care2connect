@@ -152,7 +152,6 @@ def generate_health_services(child, reference_date):
 class CaseManager(models.Manager):
 	@transaction.atomic
 	def create_case(self, child, caseworker, status, start_date, placement=None, end_date=None):
-		# Create the case instance and generate initial HealthService records
 		case = self.model(
 			child=child,
 			caseworker=caseworker,
@@ -201,7 +200,6 @@ class HealthService(models.Model):
 	def save(self, *args, **kwargs):
 		super().save(*args, **kwargs)
 
-		# Automatically generate ImmunizationRecord instances when HealthService status marked complete
 		if self.status == 'complete' and self.completed_date:
 			for vaccine in self.immunizations or []:
 				vaccine_data = EPSDT_REQUIREMENTS['immunization_schedule'].get(vaccine)

@@ -38,9 +38,9 @@ export default function NewPlacementForm({ onClose, onSuccess }) {
     },
   });
 
-  // Load Foster Families
   useEffect(() => {
     const fetchFosterFamilies = async () => {
+      setError(null)
       try {
         const families = await getFosterFamilies();
         setFosterFamilies(families);
@@ -82,12 +82,17 @@ export default function NewPlacementForm({ onClose, onSuccess }) {
     <Box sx={{ p: 2 }}>
       {success && (
         <Alert severity="success" sx={{ mb: 2 }}>
-          Foster Placement created successfully.
+          Foster placement created successfully.
+        </Alert>
+      )}
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
         </Alert>
       )}
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Child Search component */}
         <ChildSearch
           onSelectChild={setSelectedChild}
           searchFunction={getChildren}
@@ -95,7 +100,6 @@ export default function NewPlacementForm({ onClose, onSuccess }) {
           onClearSelection={() => setSelectedChild(null)}
         />
 
-        {/* Foster Placement details form */}
         {selectedChild && (
           <Card elevation={2} sx={{ mb: 3 }}>
             <CardContent>
@@ -157,7 +161,6 @@ export default function NewPlacementForm({ onClose, onSuccess }) {
           </Card>
         )}
 
-        {/* Form buttons */}
         {selectedChild && (
           <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
             <Button
