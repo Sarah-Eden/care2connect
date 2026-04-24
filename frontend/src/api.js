@@ -5,7 +5,6 @@ const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
 });
 
-
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem(ACCESS_TOKEN);
   if (token) {
@@ -13,7 +12,6 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
-
 
 export const getChildren = async () => {
   const res = await api.get("/api/children/");
@@ -36,7 +34,6 @@ export const updateChild = async (id, childData) => {
   return res.data;
 };
 
-
 export const getCases = async () => {
   const res = await api.get("/api/cases/");
   return res.data;
@@ -58,7 +55,6 @@ export const updateCase = async (id, caseData) => {
   return res.data;
 };
 
-
 export const getFosterFamilies = async () => {
   const res = await api.get("/api/foster-families/");
   return res.data;
@@ -74,7 +70,6 @@ export const createFosterFamily = async (familyData) => {
   const res = await api.post("/api/foster-families/", familyData);
   return res.data;
 };
-
 
 export const getFosterPlacements = async () => {
   const res = await api.get("/api/foster-placements/");
@@ -96,7 +91,6 @@ export const updateFosterPlacement = async (id, placementData) => {
   const res = await api.patch(`/api/foster-placements/${id}/`, placementData);
   return res.data;
 };
-
 
 export const getHealthServiceRecords = async () => {
   const res = await api.get("/api/health-services/");
@@ -135,19 +129,27 @@ export const getUsersByGroup = async (groupName) => {
   return res.data;
 };
 
+export const createUser = async (userData) => {
+  const res = await api.post("/api/users/", userData);
+  return res.data;
+};
 
 export const getUpcomingHealthServiceRecords = async () => {
   const allServices = await getHealthServiceRecords();
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const thirtyDaysFromToday = new Date(
-    today.getTime() + 30 * 24 * 60 * 60 * 1000
+    today.getTime() + 30 * 24 * 60 * 60 * 1000,
   );
 
   return allServices.filter((service) => {
     const dueDate = new Date(service.due_date);
-    return service.status === "pending" && dueDate >= today && dueDate <= thirtyDaysFromToday;
-  })
+    return (
+      service.status === "pending" &&
+      dueDate >= today &&
+      dueDate <= thirtyDaysFromToday
+    );
+  });
 };
 
 export const getOverdueHealthServiceRecords = async () => {
@@ -160,34 +162,5 @@ export const getOverdueHealthServiceRecords = async () => {
     return service.status === "pending" && dueDate < today;
   });
 };
-
-{/*
-export const getImmunizationRecords = async () => {
-  const res = await api.get("/api/immunization-records/");
-  return res.data;
-};
-
-export const getImmunizationRecord = async (id) => {
-  if (!id) throw new Error("Immunization Record ID is required");
-  const res = await api.get(`/api/immunization-records/${id}/`);
-  return res.data;
-};
-
-export const createImmunizationRecord = async (immunizationData) => {
-  const res = await api.post("/api/immunization-records/", immunizationData);
-  return res.data;
-};
-
-export const updateImmunizationRecord = async (id, immunizationData) => {
-  const res = await api.patch(`/api/immunization-records/${id}/`, immunizationData);
-  return res.data;
-};
-
-
-export const getReminderLogs = async () => {
-  const res = await api.get("/api/reminders/");
-  return res.data;
-};
-*/}
 
 export default api;

@@ -24,6 +24,7 @@ import NewChildForm from "./NewChildForm";
 import NewFosterFamilyForm from "./NewFosterFamily";
 import UpdateMedicalForm from "./UpdateMedicalForm";
 import UpdateHealthServiceForm from "./UpdateHealthServiceForm";
+import NewUserForm from "./NewUserForm";
 import {
   getFosterPlacements,
   getFosterFamily,
@@ -47,7 +48,6 @@ export default function DetailView({
   const [editingServiceId, setEditingServiceId] = useState(null);
   const [error, setError] = useState(null);
 
-
   useEffect(() => {
     const fetchAdditionalData = async () => {
       setError(null);
@@ -69,7 +69,7 @@ export default function DetailView({
 
         const allPlacements = await getFosterPlacements();
         const childPlacement = allPlacements.find(
-          (p) => p.child === childId && !p.end_date
+          (p) => p.child === childId && !p.end_date,
         );
         setFosterPlacementDetails(childPlacement || null);
 
@@ -113,6 +113,7 @@ export default function DetailView({
             {activeForm === "add_child" && "Add New Child"}
             {activeForm === "add_foster_family" && "Add New Foster Family"}
             {activeForm === "enter_health_visit" && "Enter Health Visit"}
+            {activeForm === "add_user" && "Add New User"}
           </Typography>
           <IconButton onClick={onCloseForm} size="small">
             <CloseIcon />
@@ -128,6 +129,9 @@ export default function DetailView({
         {activeForm === "add_child" && <NewChildForm onClose={onCloseForm} />}
         {activeForm === "add_foster_family" && (
           <NewFosterFamilyForm onClose={onCloseForm} />
+        )}
+        {activeForm === "add_user" && (
+          <NewUserForm onClose={onCloseForm} onSuccess={onDetailUpdated} />
         )}
       </Box>
     );
@@ -158,7 +162,7 @@ export default function DetailView({
                 </Typography>
                 <Typography variant="body1">
                   {new Date(child.dob + "T12:00:00").toLocaleDateString(
-                    "en-US"
+                    "en-US",
                   )}
                 </Typography>
               </Grid>
@@ -181,7 +185,7 @@ export default function DetailView({
                 </Typography>
                 <Typography variant="body1">
                   {new Date(selectedCase.start_date).toLocaleDateString(
-                    "en-US"
+                    "en-US",
                   )}
                 </Typography>
               </Grid>
@@ -223,7 +227,7 @@ export default function DetailView({
                   </Typography>
                   <Typography variant="body1">
                     {new Date(
-                      fosterPlacementDetails.start_date
+                      fosterPlacementDetails.start_date,
                     ).toLocaleDateString("en-US")}
                   </Typography>
                 </Grid>
@@ -342,7 +346,7 @@ export default function DetailView({
                         </TableCell>
                         <TableCell>
                           {new Date(service.due_date).toLocaleDateString(
-                            "en-US"
+                            "en-US",
                           )}
                         </TableCell>
                         <TableCell>
@@ -376,7 +380,7 @@ export default function DetailView({
               <Box sx={{ mb: 2 }}>
                 <UpdateHealthServiceForm
                   healthService={healthServices.find(
-                    (s) => s.id === editingServiceId
+                    (s) => s.id === editingServiceId,
                   )}
                   onClose={() => setEditingServiceId(null)}
                   onSuccess={() => {
@@ -393,26 +397,26 @@ export default function DetailView({
   }
 
   return (
-    <Box sx={{ p: 2 }}>    
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
+    <Box sx={{ p: 2 }}>
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
 
-    <Box
-      sx={{
-        p: 4,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100%",
-      }}
-    >
-      <Typography variant="h6" color="text.secondary" textAlign={"center"}>
-        Select a case from the list or choose an action from the menu.
-      </Typography>
-    </Box>
+      <Box
+        sx={{
+          p: 4,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100%",
+        }}
+      >
+        <Typography variant="h6" color="text.secondary" textAlign={"center"}>
+          Select a case from the list or choose an action from the menu.
+        </Typography>
+      </Box>
     </Box>
   );
 }
